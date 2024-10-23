@@ -10,4 +10,3 @@ This repository contains a trial Spring Boot project for **CSIT321 Application D
 - **REST API**: Implements basic CRUD operations for managing resources.
 - **MySQL Database Integration**: Connects to a MySQL database for data persistence.
 - **MVC Architecture**: Follows the Model-View-Controller pattern for separation of concerns.
-- **Thymeleaf**: Provides front-end templating for the web interface (optional).
