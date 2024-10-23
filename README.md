@@ -1,8 +1,8 @@
-# CSIT321 Application Development - Trial Spring Boot Project
+# Purr (Spring Boot Project) - CSIT321 Application Development
 
 ## Overview
 
-This repository contains a trial Spring Boot project for **CSIT321 Application Development**. The purpose of this project is to demonstrate the basics of building a Spring Boot application and applying key concepts learned throughout the course.
+This repository contains our Spring Boot project for **CSIT321 Application Development**. The purpose of this project is to demonstrate the basics of building a Spring Boot application and applying key concepts learned throughout the course.
 
 ## Features
 
