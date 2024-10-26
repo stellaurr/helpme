@@ -49,6 +49,7 @@ public class JwtUtil {
         return createToken(claims, username);
     }
 
+
     private String createToken(Map<String, Object> claims, String subject) {
         //Token validity for 10 hours
         long EXPIRATION_TIME = 1000 * 60 * 60 * 10;

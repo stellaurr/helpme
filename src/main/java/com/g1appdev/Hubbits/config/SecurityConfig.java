@@ -1,55 +1,60 @@
 package com.g1appdev.Hubbits.config;
 
+import com.g1appdev.Hubbits.entity.UserEntity;
+import com.g1appdev.Hubbits.security.JwtAuthenticationFilter;
 import com.g1appdev.Hubbits.security.JwtFilter;
+import com.g1appdev.Hubbits.security.JwtUtil;
 import com.g1appdev.Hubbits.service.CustomUserDetailsService;
-import jakarta.servlet.ServletException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.g1appdev.Hubbits.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtFilter jwtRequestFilter;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;  // Inject PasswordEncoder
 
-    @Autowired
-    private JwtFilter jwtRequestFilter;
+    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtFilter jwtRequestFilter, JwtUtil jwtUtil, UserService userService, PasswordEncoder passwordEncoder) {
+        this.userDetailsService = userDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.jwtUtil = jwtUtil;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder; // Constructor injection
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Allow access to auth endpoints
-                        .anyRequest().authenticated() // All other requests need authentication
-                )
-                .formLogin(form -> form
-                        .loginPage("/api/auth/login") // Custom login page URL
-                        .permitAll() // Allow access to the login page
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/api/auth/login?logout=true") // Redirect after logout
-                        .permitAll()
-                );
+        http.csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers("/api/auth/login", "/api/auth/signup","api/auth/test","api/auth/test-save","/resources/**").permitAll() // Allow login and registration without authentication
+                .anyRequest().authenticated()
+                .and()
+                .formLogin().disable();
+//                .loginPage("/api/auth/login") // Custom login page
+//                .defaultSuccessUrl("/api/home", true)
+//                .and()
+//                .logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/api/auth/login");
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
@@ -57,21 +62,25 @@ public class SecurityConfig {
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder
                 .userDetailsService(userDetailsService()) // Add your user details service
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(passwordEncoder);  // Use injected passwordEncoder
         return authenticationManagerBuilder.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Use BCrypt for password encoding
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            UserEntity user = userService.findByUsername(username);
+            if (user != null) {
+                return new org.springframework.security.core.userdetails.User(
+                        user.getUsername(), user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRole())));
+            } else {
+                throw new UsernameNotFoundException("User not found.");
+            }
+        };
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withUsername("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER").build());
-        return manager;
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil, userService);
     }
 }
