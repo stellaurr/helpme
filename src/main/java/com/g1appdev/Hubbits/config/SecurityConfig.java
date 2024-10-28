@@ -12,12 +12,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
@@ -43,17 +45,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/login", "/api/auth/signup","api/auth/test","api/auth/test-save","/resources/**").permitAll() // Allow login and registration without authentication
+                .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()  // Allow login and signup
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().disable();
-//                .loginPage("/api/auth/login") // Custom login page
-//                .defaultSuccessUrl("/api/home", true)
-//                .and()
-//                .logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/api/auth/login");
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 
         return http.build();
     }
+
 
 
     @Bean
@@ -65,6 +66,8 @@ public class SecurityConfig {
                 .passwordEncoder(passwordEncoder);  // Use injected passwordEncoder
         return authenticationManagerBuilder.build();
     }
+
+
 
     @Bean
     public UserDetailsService userDetailsService() {

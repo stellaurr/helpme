@@ -1,5 +1,6 @@
 package com.g1appdev.Hubbits.controller;
 
+import com.g1appdev.Hubbits.config.PasswordEncoderConfig;
 import com.g1appdev.Hubbits.entity.UserEntity;
 import com.g1appdev.Hubbits.service.UserService;
 import com.g1appdev.Hubbits.security.JwtUtil;
@@ -11,7 +12,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,9 +27,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Controller
-@RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
+@RestController
+@RequestMapping("/api/auth")
+
 public class AuthController {
 
     @Autowired
@@ -41,75 +45,16 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtTokenUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 
 
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> registerUser(@RequestBody UserEntity user) {
-//        user.setRole("USER");
-//        UserEntity registeredUser = userService.createUser(user);
-//        return ResponseEntity.ok(registeredUser);
-//    }
 
-    @GetMapping("/test-save")
-    public ResponseEntity<String> testSaveUser() {
-        UserEntity testUser = new UserEntity();
-        testUser.setUsername("testuser");
-        testUser.setFirstName("Test");
-        testUser.setLastName("User");
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("testpassword");  // Make sure to encode this in the service
-        testUser.setAddress("Test Address");
-        testUser.setPhoneNumber("1234567890");
-        testUser.setRole("USER");
 
-        userService.createUser(testUser);  // Save user using your service
-        return ResponseEntity.ok("User saved");
-    }
-
-//    @PostMapping("/signup")
-//    public ResponseEntity<String> signupUser(@RequestParam("firstName") String firstName,
-//                                   @RequestParam("lastName") String lastName,
-//                                   @RequestParam("username") String username,
-//                                   @RequestParam("email") String email,
-//                                   @RequestParam("password") String password,
-//                                   @RequestParam("address") String address,
-//                                   @RequestParam("phoneNumber") String phoneNumber) {
-//
-//        logger.info("Signup request received: FirstName={}, LastName={}, Username={}, Email={}, Address={}, PhoneNumber={}",
-//                firstName, lastName, username, email, address, phoneNumber);
-//
-//        try {
-//            // Set a default role for new users
-//            String role = "USER";
-//
-//            // Create a new user entity
-//            UserEntity newUser = new UserEntity();
-//            newUser.setFirstName(firstName);
-//            newUser.setLastName(lastName);
-//            newUser.setUsername(username);
-//            newUser.setEmail(email);
-//            newUser.setPassword(password);  // Will be encoded in the service layer
-//            newUser.setAddress(address);
-//            newUser.setPhoneNumber(phoneNumber);
-//            newUser.setRole(role);
-//
-//            // Attempt to save the user via service
-//            userService.createUser(newUser);
-//
-//            // Log success and return response
-//            logger.info("User successfully saved: Username={}", username);
-//            return ResponseEntity.ok("User saved successfully");
-//
-//        } catch (Exception e) {
-//            // Log the exception if something goes wrong
-//            logger.error("Error during signup", e);
-//            return ResponseEntity.status(500).body("Error during user registration: " + e.getMessage());
-//        }
-//
-//
-//    }
 
     @PostMapping("/signup")
     public ResponseEntity<String> signupUser(@RequestBody UserEntity newUser) {
@@ -139,17 +84,39 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody UserEntity loginRequest) {
+        logger.info("Login attempt with username: {}", loginRequest.getUsername());
+
+        // Load the user details
+        UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
+
+        // Log passwords
+        logger.info("Incoming password: {}", loginRequest.getPassword());
+        logger.info("Stored password (hashed): {}", userDetails.getPassword());
+
+        // Compare passwords
+        if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
+            logger.error("Passwords do NOT match!");
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+
+        logger.info("Passwords match!");
+
+        // Authenticate the user
         try {
-            authenticationManager.authenticate(
+            Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            logger.info("User {} authenticated successfully", loginRequest.getUsername());
         } catch (AuthenticationException e) {
+            logger.error("Authentication failed for user: {}", loginRequest.getUsername());
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
         String token = jwtTokenUtil.generateToken(loginRequest.getUsername());
         return ResponseEntity.ok(token);
     }
+
 
     @GetMapping("/login")
     public String loginPage() {

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import './Signup.css';
+import { Button, TextField, Grid, Container, Typography, Box } from '@mui/material';
+
 
 const Signup = () => {
     const [user, setUser] = useState({
@@ -35,40 +38,108 @@ const Signup = () => {
     };
 
     return (
-        <div>
-            <h2>Signup Page</h2>
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 5, mb: 3 }}>
+                <Typography variant="h4" align="center">Signup</Typography>
+            </Box>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>First Name:</label>
-                    <input type="text" name="firstName" value={user.firstName} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Last Name:</label>
-                    <input type="text" name="lastName" value={user.lastName} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Username:</label>
-                    <input type="text" name="username" value={user.username} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input type="email" name="email" value={user.email} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input type="password" name="password" value={user.password} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Address:</label>
-                    <input type="text" name="address" value={user.address} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Phone Number:</label>
-                    <input type="text" name="phoneNumber" value={user.phoneNumber} onChange={handleChange} required />
-                </div>
-                <button type="submit">Signup</button>
+                <Grid container spacing={2}>
+                    {/* First Name and Last Name side by side */}
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="First Name"
+                            name="firstName"
+                            variant="outlined"
+                            fullWidth
+                            value={user.firstName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <TextField
+                            label="Last Name"
+                            name="lastName"
+                            variant="outlined"
+                            fullWidth
+                            value={user.lastName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    {/* Stacked fields */}
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Username"
+                            name="username"
+                            variant="outlined"
+                            fullWidth
+                            value={user.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Email"
+                            name="email"
+                            type="email"
+                            variant="outlined"
+                            fullWidth
+                            value={user.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            variant="outlined"
+                            fullWidth
+                            value={user.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Address"
+                            name="address"
+                            variant="outlined"
+                            fullWidth
+                            value={user.address}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Phone Number"
+                            name="phoneNumber"
+                            variant="outlined"
+                            fullWidth
+                            value={user.phoneNumber}
+                            onChange={handleChange}
+                            required
+                        />
+                    </Grid>
+                    {/* Signup Button */}
+                    <Grid item xs={12}>
+                        <Button type="submit" variant="contained" color="primary" fullWidth>
+                            Signup
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {/* Link to the Signup page */}
+                        <Typography variant="body2" align="center">
+                            Already have an account? <Link to="/login">Login.</Link>
+                        </Typography>
+                    </Grid>
+                </Grid>
             </form>
-        </div>
+        </Container>
     );
 };
 

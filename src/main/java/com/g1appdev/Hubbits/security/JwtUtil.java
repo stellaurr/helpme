@@ -3,8 +3,10 @@ package com.g1appdev.Hubbits.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +15,15 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @Service
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);  // For JwtUtil class
 
-    private final String SECRET_KEY = "kiyoadmin";
+    private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -32,9 +39,8 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), SignatureAlgorithm.HS256.getJcaName());
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -45,26 +51,30 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
+        logger.info("Generating JWT token for user: {}", username);
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        String token = createToken(claims, username);
+        logger.info("Generated token: {}", token);
+        return token;
     }
 
-
     private String createToken(Map<String, Object> claims, String subject) {
-        //Token validity for 10 hours
-        long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
-        SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        long EXPIRATION_TIME = 1000 * 60 * 60 * 10;  // 10 hours validity
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(SECRET_KEY)
                 .compact();
     }
 
+
     public Boolean validateToken(String token, String username) {
+        logger.info("Validating token for user: {}", username);
         final String extractedUsername = extractUsername(token);
+        logger.info("Extracted username from token: {}", extractedUsername);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
+
 }

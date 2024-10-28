@@ -10,7 +10,7 @@ function App() {
           <Routes>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Login />} />  {/* Default to login */}
+            {/*<Route path="/" element={<Login />} />  /!* Default to login *!/*/}
           </Routes>
         </div>
       </Router>
