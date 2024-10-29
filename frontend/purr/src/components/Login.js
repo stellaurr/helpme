@@ -5,6 +5,7 @@ import './Login.css';
 import { Button, TextField, Container, Typography, Box, Grid, Paper} from '@mui/material';  // Import Material UI components
 import logo from '../assets/Purr-Light.png';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 
 
 const Login = () => {
@@ -33,6 +34,7 @@ const Login = () => {
             const token = response.data;
             localStorage.setItem('token', token); // Save the token if authentication is successful
             alert('Logged in successfully');
+            navigate('/users');
         } catch (error) {
             alert('Error logging in. Invalid username or password.');
             console.error('Error during login:', error);
@@ -40,6 +42,8 @@ const Login = () => {
     };
 
     return (
+        <>
+            <Navbar />
         <Container maxWidth="md">  {/* Set the container width to md (medium) for better control */}
             <Grid container spacing={0} alignItems="center" justifyContent="center" style={{ minHeight: '100vh' }}>
                 {/* Left side - Logo or Placeholder */}
@@ -100,6 +104,8 @@ const Login = () => {
                 </Grid>
             </Grid>
         </Container>
+
+            </>
     );
 
 };

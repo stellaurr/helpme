@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './components/Signup';
 import Login from './components/Login';
+import UserDashboard from './components/UserDashboard';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
           <Routes>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+              <Route path="/users" element={<UserDashboard/>} />
             {/*<Route path="/" element={<Login />} />  /!* Default to login *!/*/}
           </Routes>
         </div>

@@ -27,6 +27,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/auth")
@@ -132,6 +134,8 @@ public class AuthController {
     public String testPage() {
         return "test";  // This will resolve to test.html
     }
+
+
 
 
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import {Link, useNavigate} from 'react-router-dom';
 import './Signup.css';
 import { Button, TextField, Grid, Container, Typography, Box } from '@mui/material';
+import Navbar from './Navbar';
 
 
 const Signup = () => {
@@ -31,6 +32,7 @@ const Signup = () => {
             const response = await axios.post('http://localhost:8080/api/auth/signup', user);  // Correct API URL
             console.log(response.data);
             alert('Signup successful!');
+            navigate('/login');
         } catch (error) {
             console.error('Error during signup:', error);
             alert('Error signing up');
@@ -38,6 +40,8 @@ const Signup = () => {
     };
 
     return (
+        <>
+            <Navbar />
         <Container maxWidth="xs">
             <Box sx={{ mt: 5, mb: 3 }}>
                 <Typography variant="h4" align="center">Signup</Typography>
@@ -140,6 +144,8 @@ const Signup = () => {
                 </Grid>
             </form>
         </Container>
+
+    </>
     );
 };
 
