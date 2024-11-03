@@ -1,83 +1,247 @@
-// UserDashboard.js
-import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Navbar from './Navbar';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Typography, Container, Box } from '@mui/material';
+import Navbar from './Navbar'; // Import the Navbar
 
 const UserDashboard = () => {
     const [users, setUsers] = useState([]);
+    const [editingUserId, setEditingUserId] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+        address: '',
+        phoneNumber: ''
+    });
 
     useEffect(() => {
-        // Fetch user data from the backend
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/users'); // Change this URL to your actual API endpoint
-                setUsers(response.data);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
-        };
-
         fetchUsers();
     }, []);
 
-    const handleDelete = (userId) => {
-        // Delete user logic
-        axios.delete(`http://localhost:8080/api/users/${userId}`)
-            .then(response => {
-                setUsers(users.filter(user => user.userId !== userId));
-            })
-            .catch(error => {
-                console.error('Error deleting user:', error);
-            });
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/users');
+            console.log('Fetched Users:', response.data); // Log the fetched data
+            setUsers(response.data);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
     };
 
-    const handleEdit = (userId) => {
-        // Edit user logic (e.g., redirect to an edit form page)
-        alert(`Editing user with ID: ${userId}`);
+    const handleEdit = (user) => {
+        setEditingUserId(user.userId);
+        setEditFormData({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+            email: user.email,
+            address: user.address,
+            phoneNumber: user.phoneNumber
+        });
     };
+
+    const handleCancelEdit = () => {
+        setEditingUserId(null); // Exit edit mode
+    };
+
+    const handleEditChange = (e) => {
+        setEditFormData({
+            ...editFormData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSaveEdit = async (id) => {
+        const token = localStorage.getItem('token'); // Retrieve the token from local storage
+
+        if (!token) {
+            console.error("Token is missing. Please log in again.");
+            return;
+        }
+
+        try {
+            const response = await axios.put(
+                `http://localhost:8080/api/users/${id}`,
+                editFormData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Include the token here
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (response.status === 200) {
+                console.log("User updated successfully");
+                fetchUsers(); // Refresh the user list after saving
+                setEditingUserId(null); // Exit edit mode after saving
+            } else {
+                console.error("Failed to update user");
+            }
+        } catch (error) {
+            console.error("Error saving user:", error);
+        }
+    };
+
+
+
+    const handleDelete = async (id) => {
+
+        const token = localStorage.getItem('token');  // or wherever you store the token
+
+        if (!token) {
+            console.error("Token is missing. Please log in again.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,  // Include the token here
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.status === 403) {
+                console.error("Access denied: You don't have permission to delete this user.");
+            } else if (response.ok) {
+                console.log("User deleted successfully");
+                // Handle success (e.g., update the UI)
+            } else {
+                console.error("Failed to delete user");
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
+    };
+
+
 
     return (
         <>
-            <Navbar />
-        <TableContainer component={Paper}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>First Name</TableCell>
-                        <TableCell>Last Name</TableCell>
-                        <TableCell>Username</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Address</TableCell>
-                        <TableCell>Phone Number</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {users.map((user) => (
-                        <TableRow key={user.userId}>
-                            <TableCell>{user.firstName}</TableCell>
-                            <TableCell>{user.lastName}</TableCell>
-                            <TableCell>{user.username}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.address}</TableCell>
-                            <TableCell>{user.phoneNumber}</TableCell>
-                            <TableCell>
-                                <IconButton onClick={() => handleEdit(user.userId)} color="primary">
-                                    <Edit />
-                                </IconButton>
-                                <IconButton onClick={() => handleDelete(user.userId)} color="secondary">
-                                    <Delete />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-            </>
-
+            <Navbar /> {/* Add Navbar here */}
+            <Container>
+                <Box sx={{ mt: 5 }}>
+                    <Typography variant="h4" align="center">User Dashboard</Typography>
+                </Box>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>First Name</TableCell>
+                                <TableCell>Last Name</TableCell>
+                                <TableCell>Username</TableCell>
+                                <TableCell>Email</TableCell>
+                                <TableCell>Address</TableCell>
+                                <TableCell>Phone Number</TableCell>
+                                <TableCell>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {users.map((user, index) => (
+                                <TableRow key={user.userId || index}>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="firstName"
+                                                value={editFormData.firstName}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.firstName
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="lastName"
+                                                value={editFormData.lastName}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.lastName
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="username"
+                                                value={editFormData.username}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.username
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="email"
+                                                value={editFormData.email}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.email
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="address"
+                                                value={editFormData.address}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.address
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <TextField
+                                                name="phoneNumber"
+                                                value={editFormData.phoneNumber}
+                                                onChange={handleEditChange}
+                                                fullWidth
+                                            />
+                                        ) : (
+                                            user.phoneNumber
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {editingUserId === user.userId ? (
+                                            <>
+                                                <Button variant="contained" color="primary" onClick={() => handleSaveEdit(user.userId)}>
+                                                    Save
+                                                </Button>
+                                                <Button variant="contained" color="secondary" onClick={handleCancelEdit} sx={{ ml: 2 }}>
+                                                    Cancel
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>
+                                                    Edit
+                                                </Button>
+                                                <Button variant="contained" color="secondary" onClick={() => handleDelete(user.userId)} sx={{ ml: 2 }}>
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Container>
+        </>
     );
 };
 

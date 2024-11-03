@@ -63,14 +63,20 @@ public class UserService {
                     user.setFirstName(updatedUser.getFirstName());
                     user.setLastName(updatedUser.getLastName());
                     user.setEmail(updatedUser.getEmail());
-                    user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    }
                     user.setAddress(updatedUser.getAddress());
                     user.setPhoneNumber(updatedUser.getPhoneNumber());
-                    user.setRole(updatedUser.getRole());
+                    // Only set role if needed
+                    if (updatedUser.getRole() != null) {
+                        user.setRole(updatedUser.getRole());
+                    }
                     return userRepository.save(user);
                 })
-                .orElse(null);
+                .orElse(null); // or handle differently
     }
+
 
     public boolean deleteUser(Long userId) {
         if (userRepository.existsById(userId)) {

@@ -1,64 +1,65 @@
 package com.g1appdev.Hubbits.security;
 
-import com.g1appdev.Hubbits.service.UserService;
+import com.g1appdev.Hubbits.service.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtUtil jwtUtil;
-    private UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
-        this.jwtUtil = jwtUtil;
-        this.userService = userService;
-    }
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-
         String username = null;
-        String jwt = null;
+        String token = null;
 
-        // Extract JWT from the Authorization header
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+            token = authorizationHeader.substring(7);
+            username = jwtUtil.extractUsername(token);
+            logger.info("JWT Token: " + token); // Debug log for token
+            logger.info("Extracted username: " + username);
         }
 
-        // Validate the token and set authentication in the context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-            userService.findByUsername(username).getUsername(),
-            userService.findByUsername(username).getPassword(),
-            new ArrayList<>()
-        );
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                // Set the user authentication in the security context
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtil.validateToken(token, userDetails.getUsername())) {
+                // Retrieve authorities directly from the token
+                List<GrantedAuthority> authorities = jwtUtil.getAuthoritiesFromToken(token);
+
+                // Set the authorities from the token, not userDetails
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userDetails, null, authorities);
+
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                logger.info("Authentication set with roles: {}", authorities); // Debug roles
+            } else {
+                logger.warn("Invalid token for user: {}", username);
             }
         }
 
