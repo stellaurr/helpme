@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +37,8 @@ public class UserService {
         return new User(userEntity.getUsername(), userEntity.getPassword(), new ArrayList<>());
     }
 
-    public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public Optional<UserEntity> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public UserEntity findByEmail(String email) {
@@ -56,25 +58,45 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
-    public UserEntity updateUser(Long userId, UserEntity updatedUser) {
+    public UserEntity updateUser(Long userId, UserEntity updatedUser, MultipartFile profilePicture) {
         return userRepository.findById(userId)
-                .map(user -> {
-                    user.setUsername(updatedUser.getUsername());
-                    user.setFirstName(updatedUser.getFirstName());
-                    user.setLastName(updatedUser.getLastName());
-                    user.setEmail(updatedUser.getEmail());
+                .map(existingUser -> {
+                    // Update fields if they are provided in updatedUser
+                    if (updatedUser.getUsername() != null) {
+                        existingUser.setUsername(updatedUser.getUsername());
+                    }
+                    if (updatedUser.getFirstName() != null) {
+                        existingUser.setFirstName(updatedUser.getFirstName());
+                    }
+                    if (updatedUser.getLastName() != null) {
+                        existingUser.setLastName(updatedUser.getLastName());
+                    }
+                    if (updatedUser.getEmail() != null) {
+                        existingUser.setEmail(updatedUser.getEmail());
+                    }
                     if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-                        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                        existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
                     }
-                    user.setAddress(updatedUser.getAddress());
-                    user.setPhoneNumber(updatedUser.getPhoneNumber());
-                    // Only set role if needed
+                    if (updatedUser.getAddress() != null) {
+                        existingUser.setAddress(updatedUser.getAddress());
+                    }
+                    if (updatedUser.getPhoneNumber() != null) {
+                        existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+                    }
                     if (updatedUser.getRole() != null) {
-                        user.setRole(updatedUser.getRole());
+                        existingUser.setRole(updatedUser.getRole());
                     }
-                    return userRepository.save(user);
+                    // Handle profile picture update
+                    if (profilePicture != null && !profilePicture.isEmpty()) {
+                        try {
+                            existingUser.setProfilePicture(profilePicture.getBytes());
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error setting profile picture", e);
+                        }
+                    }
+                    return userRepository.save(existingUser);
                 })
-                .orElse(null); // or handle differently
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 
@@ -85,4 +107,6 @@ public class UserService {
         }
         return false;
     }
+
+
 }

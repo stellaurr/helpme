@@ -25,6 +25,9 @@ public class UserEntity {
     private String phoneNumber;
     private String role;
 
+    @Lob
+    private byte[] profilePicture;
+
     private LocalDateTime createdAt;
 
     public UserEntity() {
@@ -111,6 +114,14 @@ public class UserEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     @Override

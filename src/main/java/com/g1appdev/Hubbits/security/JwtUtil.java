@@ -40,13 +40,27 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
+//    private Claims extractAllClaims(String token) {
+//        return Jwts.parserBuilder()
+//                .setSigningKey(SECRET_KEY)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//    }
+
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            logger.error("Error parsing JWT token: {}", e.getMessage());
+            throw e;
+        }
     }
+
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());

@@ -25,6 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -52,11 +53,12 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/users").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/users", "/api/lostandfound","/api/users/me").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/users/**").authenticated()
+                .anyRequest().permitAll() //.authenticated() when applying admin
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -75,8 +77,10 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            UserEntity user = userService.findByUsername(username);
-            if (user != null) {
+            Optional<UserEntity> userOptional = userService.findByUsername(username);
+
+            if (userOptional.isPresent()) {
+                UserEntity user = userOptional.get();
                 return new org.springframework.security.core.userdetails.User(
                         user.getUsername(), user.getPassword(),
                         List.of(new SimpleGrantedAuthority(user.getRole())));
@@ -85,6 +89,7 @@ public class SecurityConfig {
             }
         };
     }
+
 
 
     @Bean

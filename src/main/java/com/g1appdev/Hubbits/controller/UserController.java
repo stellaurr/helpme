@@ -1,12 +1,16 @@
 package com.g1appdev.Hubbits.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g1appdev.Hubbits.entity.UserEntity;
 import com.g1appdev.Hubbits.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,16 +47,23 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    // Update a user by ID
-
+    // Update a user by ID with profile picture support
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserEntity> updateUser(@PathVariable Long id, @RequestBody UserEntity updatedUser) {
-        UserEntity user = userService.updateUser(id, updatedUser);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<UserEntity> updateUser(
+            @PathVariable Long id,
+            @RequestParam("user") String userJson,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+        try {
+            UserEntity updatedUser = new ObjectMapper().readValue(userJson, UserEntity.class);
+            UserEntity user = userService.updateUser(id, updatedUser, profilePicture);
+            if (user != null) {
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -69,4 +80,31 @@ public class UserController {
             return ResponseEntity.status(500).body("Error deleting user");
         }
     }
+
+
+    // Get the currently authenticated user
+    @GetMapping("/me")
+    public ResponseEntity<UserEntity> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication != null ? authentication.getName() : null;
+
+        if (currentUsername == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<UserEntity> user = userService.findByUsername(currentUsername);
+        if (user.isPresent()) {
+            System.out.println("User found: " + user.get().getUsername());  // Log username to verify
+            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        } else {
+            System.out.println("User not found for username: " + currentUsername);  // Log missing user
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
+
+
 }

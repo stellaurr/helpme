@@ -19,9 +19,19 @@ const Navbar = () => {
                 <Button color="inherit" component={Link} to="/signup">
                     Signup
                 </Button>
-                <Button color="inherit" component={Link} to="/users">
-                    Dashboard
+                <Button color="inherit" component={Link} to="/profile">
+                    Profile
                 </Button>
+                <Button color="inherit" component={Link} to="/users">
+                    User Dashboard
+                </Button>
+                <Button color="inherit" component={Link} to="/laf">
+                    Lost And Found
+                </Button>
+                <Button color="inherit" component={Link} to="/lafs">
+                    L&F Dashboard
+                </Button>
+
             </Toolbar>
         </AppBar>
     );

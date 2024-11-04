@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.security.core.GrantedAuthority;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -71,14 +69,14 @@ public class AuthController {
         logger.info("Login attempt with username: {}", loginRequest.getUsername());
 
         // Load the user entity to retrieve full details, including role
-        UserEntity userEntity = userService.findByUsername(loginRequest.getUsername());
+        Optional<UserEntity> userEntity = userService.findByUsername(loginRequest.getUsername());
 
         // Log passwords
         logger.info("Incoming password: {}", loginRequest.getPassword());
-        logger.info("Stored password (hashed): {}", userEntity.getPassword());
+        logger.info("Stored password (hashed): {}", userEntity.get().getPassword());
 
         // Compare passwords
-        if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.get().getPassword())) {
             logger.error("Passwords do NOT match!");
             return ResponseEntity.status(401).body("Invalid credentials");
         }
@@ -98,7 +96,7 @@ public class AuthController {
         }
 
         // Get the role directly from UserEntity
-        List<String> roles = List.of(userEntity.getRole().startsWith("ROLE_") ? userEntity.getRole() : "ROLE_" + userEntity.getRole());
+        List<String> roles = List.of(userEntity.get().getRole().startsWith("ROLE_") ? userEntity.get().getRole() : "ROLE_" + userEntity.get().getRole());
 
         // Log roles to verify they are set correctly
         logger.info("Roles for token generation: {}", roles);

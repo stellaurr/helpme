@@ -53,21 +53,27 @@ const UserDashboard = () => {
     };
 
     const handleSaveEdit = async (id) => {
-        const token = localStorage.getItem('token'); // Retrieve the token from local storage
+        const token = localStorage.getItem('token');
 
         if (!token) {
             console.error("Token is missing. Please log in again.");
             return;
         }
 
+        const formData = new FormData();
+        formData.append("user", JSON.stringify(editFormData));
+        // if (profilePicture) { // Assume you have a state for the profile picture
+        //     formData.append("profilePicture", profilePicture);
+        // }
+
         try {
             const response = await axios.put(
                 `http://localhost:8080/api/users/${id}`,
-                editFormData,
+                formData,
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Include the token here
-                        'Content-Type': 'application/json'
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data', // Change to multipart/form-data
                     }
                 }
             );
@@ -107,8 +113,10 @@ const UserDashboard = () => {
             if (response.status === 403) {
                 console.error("Access denied: You don't have permission to delete this user.");
             } else if (response.ok) {
+                alert("User deleted successfully");
                 console.log("User deleted successfully");
                 // Handle success (e.g., update the UI)
+                window.location.reload();
             } else {
                 console.error("Failed to delete user");
             }

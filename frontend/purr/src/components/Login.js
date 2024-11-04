@@ -31,10 +31,15 @@ const Login = () => {
                     'Content-Type': 'application/json',
                 },
             });
+
+            console.log("Response data:", response.data);
+
             const token = response.data;
+
+
             localStorage.setItem('token', token); // Save the token if authentication is successful
             alert('Logged in successfully');
-            navigate('/users');
+            navigate('/profile');
         } catch (error) {
             alert('Error logging in. Invalid username or password.');
             console.error('Error during login:', error);
