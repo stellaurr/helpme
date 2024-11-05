@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 import './Login.css';
-import { Button, TextField, Container, Typography, Box, Grid, Paper} from '@mui/material';  // Import Material UI components
+import { Button, TextField, Container, Typography, Box, Grid, Paper, IconButton, InputAdornment} from '@mui/material';  // Import Material UI components
 import logo from '../assets/Purr-Light.png';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 
 const Login = () => {
@@ -15,6 +16,12 @@ const Login = () => {
     });
 
     const navigate = useNavigate();
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleChange = (e) => {
         setCredentials({
@@ -84,12 +91,21 @@ const Login = () => {
                                     <TextField
                                         label="Password"
                                         name="password"
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         variant="outlined"
                                         fullWidth
                                         value={credentials.password}
                                         onChange={handleChange}
                                         required
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={toggleShowPassword} edge="end">
+                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>

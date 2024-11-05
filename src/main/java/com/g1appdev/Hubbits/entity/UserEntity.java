@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Entity
 //@AllArgsConstructor
@@ -25,7 +26,7 @@ public class UserEntity {
     private String phoneNumber;
     private String role;
 
-    @Lob
+    @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
     private byte[] profilePicture;
 
     private LocalDateTime createdAt;
@@ -116,8 +117,12 @@ public class UserEntity {
         this.createdAt = createdAt;
     }
 
-    public byte[] getProfilePicture() {
-        return profilePicture;
+//    public byte[] getProfilePicture() {
+//        return profilePicture;
+//    }
+
+    public String getProfilePictureBase64() {
+        return profilePicture != null ? Base64.getEncoder().encodeToString(profilePicture) : null;
     }
 
     public void setProfilePicture(byte[] profilePicture) {

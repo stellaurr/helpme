@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -100,6 +101,32 @@ public class UserController {
             System.out.println("User not found for username: " + currentUsername);  // Log missing user
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> passwordData) {
+        String oldPassword = passwordData.get("oldPassword");
+        String newPassword = passwordData.get("newPassword");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication != null ? authentication.getName() : null;
+
+        if (currentUsername == null) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<UserEntity> userOptional = userService.findByUsername(currentUsername);
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            boolean success = userService.changePassword(user.getUserId(), oldPassword, newPassword);
+            if (success) {
+                return new ResponseEntity<>("Password changed successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Old password is incorrect", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
     }
 
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Box, Typography, Button, TextField, Avatar, Grid, Stack } from '@mui/material';
+import { Container, Box, Typography, Button, TextField, Avatar, Grid, Stack, InputAdornment, IconButton } from '@mui/material';
 import Navbar from './Navbar';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -21,6 +22,12 @@ const Profile = () => {
         newPassword: '',
         confirmPassword: ''
     });
+
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+
 
     useEffect(() => {
         fetchUser();
@@ -47,6 +54,11 @@ const Profile = () => {
                 address: response.data.address,
                 phoneNumber: response.data.phoneNumber
             });
+            if (response.data.profilePicture) {
+                setProfilePicture(`data:image/jpeg;base64,${response.data.profilePicture}`);
+            } else {
+                setProfilePicture(null); // No profile picture
+            }
         } catch (error) {
             console.error('Error fetching user:', error);
         }
@@ -56,7 +68,7 @@ const Profile = () => {
 
     const handleCancelEdit = () => {
         setEditingUserId(null);
-        setProfilePicture(null);
+        fetchUser();
     };
 
     const handleEditChange = (e) => {
@@ -67,7 +79,10 @@ const Profile = () => {
     };
 
     const handleFileChange = (e) => {
-        setProfilePicture(e.target.files[0]);
+        // setProfilePicture(e.target.files[0]);
+
+        const file = e.target.files[0];
+        setProfilePicture(file);
     };
 
     const handleSaveEdit = async () => {
@@ -163,7 +178,7 @@ const Profile = () => {
                         }}
                     >
                         <Avatar
-                            src={profilePicture ? URL.createObjectURL(profilePicture) : null}
+                            src={profilePicture && typeof profilePicture === 'string' ? profilePicture : null}
                             alt="Profile Picture"
                             sx={{
                                 width: 120,
@@ -346,7 +361,7 @@ const Profile = () => {
                                         <TextField
                                             label="Old Password"
                                             name="oldPassword"
-                                            type="password"
+                                            type={showOldPassword ? "text" : "password"}
                                             value={passwordData.oldPassword}
                                             onChange={(e) =>
                                                 setPasswordData({ ...passwordData, oldPassword: e.target.value })
@@ -354,11 +369,20 @@ const Profile = () => {
                                             fullWidth
                                             margin="normal"
                                             size="small"
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={()=>setShowOldPassword(!showOldPassword)} edge="end">
+                                                            {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                )
+                                            }}
                                         />
                                         <TextField
                                             label="New Password"
                                             name="newPassword"
-                                            type="password"
+                                            type={showNewPassword ? "text" : "password"}
                                             value={passwordData.newPassword}
                                             onChange={(e) =>
                                                 setPasswordData({ ...passwordData, newPassword: e.target.value })
@@ -366,11 +390,20 @@ const Profile = () => {
                                             fullWidth
                                             margin="normal"
                                             size="small"
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={()=>setShowNewPassword(!showNewPassword)} edge="end">
+                                                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                )
+                                            }}
                                         />
                                         <TextField
                                             label="Confirm New Password"
                                             name="confirmPassword"
-                                            type="password"
+                                            type={showConfirmPassword ? "text" : "password"}
                                             value={passwordData.confirmPassword}
                                             onChange={(e) =>
                                                 setPasswordData({
@@ -381,6 +414,16 @@ const Profile = () => {
                                             fullWidth
                                             margin="normal"
                                             size="small"
+
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                                                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                )
+                                            }}
                                         />
                                         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                                             <Button variant="contained" color="primary" onClick={handlePasswordChange}>
