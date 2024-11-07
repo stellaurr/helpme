@@ -6,8 +6,9 @@ import UserDashboard from './components/UserDashboard';
 import Home from "./components/Home";
 import LostAndFound from "./components/LostAndFound";
 import Sponsor from "./components/Sponsor";
-import Adoption from "./components/Adoption";
 import Volunteer from "./components/Volunteer";
+import AdoptionForm from './components/AdoptionForm';
+import AdoptionList from './components/AdoptionList';
 
 
 import Profile from "./components/Profile";
@@ -27,8 +28,9 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/lost-and-found" element={<LostAndFound />} />
             <Route path="/sponsor" element={<Sponsor />} />
-            <Route path="/adoption" element={<Adoption />} />
             <Route path="/volunteer" element={<Volunteer />} />
+            <Route path="/adoption" element={<AdoptionForm />} />
+            <Route path="/adopt_dash" element={<AdoptionList/>} />
 
           </Routes>
         </div>
