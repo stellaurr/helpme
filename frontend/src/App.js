@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import UserDashboard from './components/UserDashboard';
-import LostAndFoundForm from "./components/LostAndFoudForm";
-import LostAndFoundDashboard from "./components/LostAndFoundDashboard";
+
 import Profile from "./components/Profile";
 
 function App() {
@@ -15,8 +14,6 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
               <Route path="/users" element={<UserDashboard/>} />
-              <Route path="/laf" element={<LostAndFoundForm />} />
-              <Route path="/lafs" element={<LostAndFoundDashboard/>} />
               <Route path="/profile" element={<Profile/>} />
             <Route path="/" element={<Login />} />  {/* Default to login */}
           </Routes>
