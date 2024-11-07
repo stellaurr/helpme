@@ -84,22 +84,8 @@ const CreatePostDialog = ({
     dataToSubmit.append("lastSeen", formData.lastSeen);
     dataToSubmit.append("description", formData.description);
 
-    if (isEditing) {
-      if (formData.imageData) {
+    if (formData.imageData) {
         dataToSubmit.append("imageFile", formData.imageData);
-      }
-      if (!postToEdit) {
-        console.error("No post to edit. Please select a post.");
-        alert("Error: No post to edit. Please try again.");
-        return;
-      }
-    } else {
-      if (!formData.imageData) {
-        alert("Image file is required when creating a post.");
-        return;
-      } else {
-        dataToSubmit.append("imageFile", formData.imageData);
-      }
     }
 
     try {
@@ -137,7 +123,8 @@ const CreatePostDialog = ({
           (error.response?.data?.message || error.message)
       );
     }
-  };
+};
+
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>

@@ -38,40 +38,44 @@ public class LostAndFoundController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createReport(
-            @RequestParam("reportType") String reportType,
-            @RequestParam("petCategory") String petCategory,
-            @RequestParam("dateReported") String dateReported,
-            @RequestParam("lastSeen") String lastSeen,
-            @RequestParam("description") String description,
-            @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+public ResponseEntity<String> createReport(
+        @RequestParam("reportType") String reportType,
+        @RequestParam("petCategory") String petCategory,
+        @RequestParam("dateReported") String dateReported,
+        @RequestParam("lastSeen") String lastSeen,
+        @RequestParam("description") String description,
+        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
 
-        if (reportType == null || description == null || lastSeen == null || imageFile.isEmpty()) {
-            return ResponseEntity.badRequest().body("All fields are required, including the image file.");
-        }
-
-        byte[] image = imageFile.getBytes();
-
-        Date parsedDate;
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            parsedDate = dateFormat.parse(dateReported);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
-        }
-
-        LostAndFoundEntity report = new LostAndFoundEntity();
-        report.setDateReported(parsedDate);
-        report.setReportType(reportType);
-        report.setDescription(description);
-        report.setLastSeen(lastSeen);
-        report.setImage(image); 
-        report.setPetCategory(petCategory);
-
-        lostAndFoundService.createReport(report);
-
-        return ResponseEntity.ok("Report submitted successfully");
+    if (reportType == null || description == null || lastSeen == null) {
+        return ResponseEntity.badRequest().body("All fields except image are required.");
     }
+
+    byte[] image = null;
+    if (imageFile != null && !imageFile.isEmpty()) {
+        image = imageFile.getBytes();
+    }
+
+    Date parsedDate;
+    try {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        parsedDate = dateFormat.parse(dateReported);
+    } catch (ParseException e) {
+        return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
+    }
+
+    LostAndFoundEntity report = new LostAndFoundEntity();
+    report.setDateReported(parsedDate);
+    report.setReportType(reportType);
+    report.setDescription(description);
+    report.setLastSeen(lastSeen);
+    report.setImage(image);
+    report.setPetCategory(petCategory);
+
+    lostAndFoundService.createReport(report);
+
+    return ResponseEntity.ok("Report submitted successfully");
+}
+
 
     @PutMapping("/{reportID}")
     public ResponseEntity<String> updateReport(

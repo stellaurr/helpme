@@ -15,7 +15,7 @@ const NewsFeed = () => {
 
   const fetchLostItems = async () => {
     try {
-      const response = await axios.get("/api/lostandfound");
+      const response = await axios.get("http://localhost:8080/api/lostandfound");
       setLostItems(response.data);
     } catch (error) {
       console.error("Error fetching lost items:", error);
