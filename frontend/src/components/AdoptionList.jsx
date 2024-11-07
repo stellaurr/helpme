@@ -104,7 +104,7 @@ const AdoptionList = () => {
                                 <Typography variant="body1">Submission Date: {adoption.submissionDate}</Typography>
                                 <Typography variant="body1">Status: {adoption.status}</Typography>
                                 <div style={styles.buttonContainer}>
-                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="primary" sx={{ marginRight: 1 }}>Edit</Button>
+                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="success" sx={{ marginRight: 1 }}>Edit</Button>
                                     <Button onClick={() => handleDeleteClick(adoption.adoptionID)} variant="contained" color="error">Delete</Button>
                                 </div>
                             </CardContent>
@@ -127,7 +127,7 @@ const AdoptionList = () => {
                                 <Typography variant="body1">Submission Date: {adoption.submissionDate}</Typography>
                                 <Typography variant="body1">Status: {adoption.status}</Typography>
                                 <div style={styles.buttonContainer}>
-                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="primary" sx={{ marginRight: 1 }}>Edit</Button>
+                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="success" sx={{ marginRight: 1 }}>Edit</Button>
                                     <Button onClick={() => handleDeleteClick(adoption.adoptionID)} variant="contained" color="error">Delete</Button>
                                 </div>
                             </CardContent>
@@ -150,7 +150,7 @@ const AdoptionList = () => {
                                 <Typography variant="body1">Submission Date: {adoption.submissionDate}</Typography>
                                 <Typography variant="body1">Status: {adoption.status}</Typography>
                                 <div style={styles.buttonContainer}>
-                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="primary" sx={{ marginRight: 1 }}>Edit</Button>
+                                    <Button onClick={() => handleEditClick(adoption)} variant="contained" color="success" sx={{ marginRight: 1 }}>Edit</Button>
                                     <Button onClick={() => handleDeleteClick(adoption.adoptionID)} variant="contained" color="error">Delete</Button>
                                 </div>
                             </CardContent>
