@@ -31,7 +31,7 @@ const AdoptionForm = ({ onSubmit }) => {
         resetForm();
 
         try {
-            await axios.post('/api/adoptions', newAdoption);
+            await axios.post('http://localhost:8080/api/adoptions', newAdoption);
             setSuccessMessage('Adoption form submitted successfully!');
             onSubmit(newAdoption); 
         } catch (error) {

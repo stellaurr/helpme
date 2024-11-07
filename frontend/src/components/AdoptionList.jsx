@@ -28,7 +28,7 @@ const AdoptionList = () => {
     useEffect(() => {
         const fetchAdoptions = async () => {
             try {
-                const response = await axios.get('/api/adoptions');
+                const response = await axios.get('http://localhost:8080/api/adoptions');
                 setAdoptions(response.data);
             } catch (error) {
                 setError("Failed to load adoptions.");
@@ -48,7 +48,7 @@ const AdoptionList = () => {
         if (!deleteId) return;
 
         try {
-            await axios.delete(`/api/adoptions/${deleteId}`);
+            await axios.delete(`http://localhost:8080/api/adoptions/${deleteId}`);
             setAdoptions(prevAdoptions => prevAdoptions.filter(adoption => adoption.adoptionID !== deleteId));
             setSuccessMessage("Adoption deleted successfully!");
             setDeleteId(null);
@@ -66,7 +66,7 @@ const AdoptionList = () => {
         if (!editAdoption) return;
 
         try {
-            const response = await axios.put(`/api/adoptions/${editAdoption.adoptionID}`, editAdoption);
+            const response = await axios.put(`http://localhost:8080/api/adoptions/${editAdoption.adoptionID}`, editAdoption);
             setAdoptions(prevAdoptions => prevAdoptions.map(adoption => (adoption.adoptionID === response.data.adoptionID ? response.data : adoption)));
             setEditDialogOpen(false);
             setEditAdoption(null);
