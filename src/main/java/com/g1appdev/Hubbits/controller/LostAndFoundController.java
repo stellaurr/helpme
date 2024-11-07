@@ -2,99 +2,138 @@ package com.g1appdev.Hubbits.controller;
 
 import com.g1appdev.Hubbits.entity.LostAndFoundEntity;
 import com.g1appdev.Hubbits.service.LostAndFoundService;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/lostandfound")
-@CrossOrigin(origins = "http://localhost:3000")
 public class LostAndFoundController {
 
+    private final LostAndFoundService lostAndFoundService;
+
     @Autowired
-    private LostAndFoundService lostAndFoundService;
+    public LostAndFoundController(LostAndFoundService lostAndFoundService) {
+        this.lostAndFoundService = lostAndFoundService;
+    }
 
     @GetMapping
     public List<LostAndFoundEntity> getAllReports() {
         return lostAndFoundService.getAllReports();
     }
 
-    @GetMapping("/{id}")
-    public Optional<LostAndFoundEntity> getReportById(@PathVariable int id) {
-        return lostAndFoundService.getReportById(id);
+    @GetMapping("/{reportID}")
+    public ResponseEntity<LostAndFoundEntity> getReportById(@PathVariable int reportID) {
+        return lostAndFoundService.getReportById(reportID)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<LostAndFoundEntity> createReport(
+    @PostMapping
+    public ResponseEntity<String> createReport(
             @RequestParam("reportType") String reportType,
-            @RequestParam("dateReported") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateReported,
+            @RequestParam("petCategory") String petCategory,
+            @RequestParam("dateReported") String dateReported,
             @RequestParam("lastSeen") String lastSeen,
             @RequestParam("description") String description,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
+            @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+
+        if (reportType == null || description == null || lastSeen == null || imageFile.isEmpty()) {
+            return ResponseEntity.badRequest().body("All fields are required, including the image file.");
+        }
+
+        byte[] image = imageFile.getBytes();
+
+        Date parsedDate;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            parsedDate = dateFormat.parse(dateReported);
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
+        }
 
         LostAndFoundEntity report = new LostAndFoundEntity();
+        report.setDateReported(parsedDate);
         report.setReportType(reportType);
-
-        // Convert LocalDate to java.util.Date
-        Date convertedDate = Date.from(dateReported.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        report.setDateReported(convertedDate);
-
-        report.setLastSeen(lastSeen);
         report.setDescription(description);
+        report.setLastSeen(lastSeen);
+        report.setImage(image); 
+        report.setPetCategory(petCategory);
 
-        if (image != null && !image.isEmpty()) {
-            try {
-                report.setImage(image.getBytes()); // Assuming `image` is stored as a byte array (Blob)
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+        lostAndFoundService.createReport(report);
 
-        LostAndFoundEntity savedReport = lostAndFoundService.saveReport(report);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);
+        return ResponseEntity.ok("Report submitted successfully");
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<LostAndFoundEntity> updateReport(@PathVariable("id") int id, @RequestBody Map<String, Object> updates) {
-        Optional<LostAndFoundEntity> existingReportOpt = lostAndFoundService.getReportById(id);
+    @PutMapping("/{reportID}")
+    public ResponseEntity<String> updateReport(
+            @PathVariable int reportID,
+            @RequestParam("reportType") String reportType,
+            @RequestParam("petCategory") String petCategory,
+            @RequestParam("dateReported") String dateReported,
+            @RequestParam("lastSeen") String lastSeen,
+            @RequestParam("description") String description,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
 
-        if (existingReportOpt.isPresent()) {
-            LostAndFoundEntity existingReport = existingReportOpt.get();
+        
+        if (reportType == null || description == null || lastSeen == null) {
+            return ResponseEntity.badRequest().body("All fields are required except the image file.");
+        }
 
-            // Check for reportType in the updates map and update it
-            if (updates.containsKey("reportType")) {
-                existingReport.setReportType((String) updates.get("reportType"));
-            }
-
-            // Save only the modified field(s)
-            LostAndFoundEntity updatedReport = lostAndFoundService.saveReport(existingReport);
-            return ResponseEntity.ok(updatedReport);
-        } else {
+        LostAndFoundEntity existingReport = lostAndFoundService.getReportById(reportID).orElse(null);
+        if (existingReport == null) {
             return ResponseEntity.notFound().build();
         }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            existingReport.setImage(imageFile.getBytes());
+        } else {
+            existingReport.setImage(existingReport.getImage());
+        }
+
+        Date parsedDate;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            parsedDate = dateFormat.parse(dateReported);
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
+        }
+
+        // Update fields
+        existingReport.setDateReported(parsedDate);
+        existingReport.setReportType(reportType);
+        existingReport.setPetCategory(petCategory);
+        existingReport.setDescription(description);
+        existingReport.setLastSeen(lastSeen);
+
+        lostAndFoundService.updateReport(reportID, existingReport);
+
+        return ResponseEntity.ok("Report updated successfully");
     }
 
 
-    @DeleteMapping("/{id}")
-    public void deleteReport(@PathVariable int id) {
-        lostAndFoundService.deleteReport(id);
+
+    @DeleteMapping("/{reportID}")
+    public ResponseEntity<Void> deleteReport(@PathVariable int reportID) {
+        return lostAndFoundService.deleteReport(reportID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{id}/found")
-    public LostAndFoundEntity markAsFound(@PathVariable int id) {
-        return lostAndFoundService.markAsFound(id);
+    @GetMapping("/lastseen/{lastSeen}")
+    public ResponseEntity<List<LostAndFoundEntity>> findByLastSeen(@PathVariable String lastSeen) {
+        List<LostAndFoundEntity> results = lostAndFoundService.findByLastSeen(lastSeen);
+        return results.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/api/lostandfound/search")
+    public List<LostAndFoundEntity> searchReports(@RequestParam String location) {
+        return lostAndFoundService.searchReports(location);
     }
 }

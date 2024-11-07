@@ -1,25 +1,48 @@
 package com.g1appdev.Hubbits.entity;
 
-import jakarta.persistence.*;
 import java.util.Date;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "lostandfound")
 public class LostAndFoundEntity {
-
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrementing primary key
     private int reportID;
+    
+    @Column(name = "reporttype") // Column name in the database
+    private String reportType;
 
-    private String reportType; // "Lost" or "Found"
+    @Column(name = "petcategory")
+    private String petCategory;
+    
+    @Column(name = "datereported") // Column name in the database
+    @Temporal(TemporalType.DATE) // Specifies the date type
     private Date dateReported;
+    
+    @Column(name = "lastseen") // Column name in the database
     private String lastSeen;
-    private String description;
+    
+    private String description; // Description of the lost and found item
+    
+    @Lob // Indicates that this is a large object
+    @Column(name = "imagedata") // Column name in the database
+    private byte[] image; // Store image data as byte array
 
-    @Lob
-    private byte[] image; // Stores image as Blob data
+    // Default constructor
+    public LostAndFoundEntity() {}
+
+    // Constructor with all parameters except reportID
+    public LostAndFoundEntity(String reportType, Date dateReported, String lastSeen, String description, byte[] image) {
+        this.reportType = reportType;
+        this.dateReported = dateReported;
+        this.lastSeen = lastSeen;
+        this.description = description;
+        this.image = image; // Initialize the image field
+    }
 
     // Getters and Setters
-
     public int getReportID() {
         return reportID;
     }
@@ -30,6 +53,14 @@ public class LostAndFoundEntity {
 
     public String getReportType() {
         return reportType;
+    }
+
+    public void setPetCategory(String petCategory) {
+        this.petCategory = petCategory;
+    }
+
+    public String getPetCategory() {
+        return petCategory;
     }
 
     public void setReportType(String reportType) {
