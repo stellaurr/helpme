@@ -3,8 +3,16 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import UserDashboard from './components/UserDashboard';
+import Home from "./components/Home";
+import LostAndFound from "./components/LostAndFound";
+import Sponsor from "./components/Sponsor";
+import Adoption from "./components/Adoption";
+import Volunteer from "./components/Volunteer";
+
 
 import Profile from "./components/Profile";
+
+// import ReactDOM from "react-dom";
 
 function App() {
   return (
@@ -16,37 +24,20 @@ function App() {
               <Route path="/users" element={<UserDashboard/>} />
               <Route path="/profile" element={<Profile/>} />
             <Route path="/" element={<Login />} />  {/* Default to login */}
+            <Route path="/home" element={<Home />} />
+            <Route path="/lost-and-found" element={<LostAndFound />} />
+            <Route path="/sponsor" element={<Sponsor />} />
+            <Route path="/adoption" element={<Adoption />} />
+            <Route path="/volunteer" element={<Volunteer />} />
+
           </Routes>
         </div>
       </Router>
   );
 }
 
+//ReactDOM.render(<App />, document.getElementById("root"));
+
 export default App;
 
 
-// import logo from './logo.svg';
-// import './App.css';
-//
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-//
-// export default App;
