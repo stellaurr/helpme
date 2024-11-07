@@ -11,7 +11,6 @@ import AdoptionForm from './components/AdoptionForm';
 import AdoptionList from './components/AdoptionList';
 import DonationForm from './components/DonationForm';
 import DonationTable from './components/DonationTable';
-// import NewsFeed from './components/NewsFeed';
 
 
 import Profile from "./components/Profile";
