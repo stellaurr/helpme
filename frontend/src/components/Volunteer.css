@@ -1,0 +1,24 @@
+.my-4 {
+    margin: 2rem 0; /* Adjust spacing around the component */
+  }
+  
+  .text-center {
+    text-align: center; /* Center text alignment */
+  }
+  
+  .footer {
+    padding: 1rem; /* Padding for the footer */
+    background-color: #f1f1f1; /* Light gray background for footer */
+    border-top: 1px solid #ddd; /* Top border for separation */
+  }
+  
+  /* Add specific styles for buttons */
+  .MuiButton-root {
+    background-color: #007bff !important; /* Bootstrap primary blue */
+    color: white !important; /* Text color */
+  }
+  
+  .MuiButton-root:hover {
+    background-color: #0056b3 !important; /* Darker blue on hover */
+  }
+  
