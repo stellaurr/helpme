@@ -1,7 +1,7 @@
 import React from "react";
 import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import logoWhite from "../images/logo_white.png";
+import logoWhite from "../assets/logo_white.png";
 
 const Menu = () => (
   <AppBar position="fixed" sx={{ mb: 4 }}>

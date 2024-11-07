@@ -14,7 +14,7 @@ import Sponsor from "./components/Sponsor";
 import Adoption from "./components/Adoption";
 import Volunteer from "./components/Volunteer";
 import Login from "./components/Login";
-import logoWhite from "./images/logo_white.png"; // Adjust path as necessary
+import logoWhite from "./assets/logo_white.png"; // Adjust path as necessary
 
 const theme = createTheme({
   palette: {
