@@ -13,7 +13,7 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material"; // Import Material UI components
-import logo from "../assets/Purr-Light.png";
+import logo from "../assets/logo_colored.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 

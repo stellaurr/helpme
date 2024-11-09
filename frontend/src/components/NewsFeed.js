@@ -64,8 +64,8 @@ const NewsFeed = () => {
         sx={{
           position: "absolute",
           top: "90px",
-          left: "70%", // Center the Box horizontally
-          transform: "translateX(-50%)", // Correctly center the box
+          left: "70%",
+          transform: "translateX(-50%)",
           zIndex: 10,
           width: "80%",
           maxWidth: "400px",
@@ -80,9 +80,11 @@ const NewsFeed = () => {
           sx={{
             width: "100%",
             backgroundColor: "transparent",
+
             "& .MuiOutlinedInput-root": {
               height: "35px",
               border: "1px solid white",
+              borderRadius: "25px",
               "&.Mui-focused": {
                 borderColor: "white",
               },
@@ -116,18 +118,24 @@ const NewsFeed = () => {
           container
           justifyContent="space-between"
           alignItems="center"
+          maxWidth={"lg"}
           sx={{ mb: 2 }}
         >
-          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-            LOST AND FOUND
+          <Typography
+            variant="h2"
+            component="div"
+            color="primary"
+            sx={{ fontWeight: "bold", fontFamily: "'Caramel', sans-serif" }}
+          >
+            Lost And Found
           </Typography>
         </Grid>
 
         <Grid
           container
           justifyContent="center"
+          rows={2}
           sx={{
-            mt: 6,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -137,15 +145,25 @@ const NewsFeed = () => {
           <TextField
             variant="outlined"
             fullWidth
-            multiline
+            height="5px"
             rows={2}
             placeholder="Have you found someone's pet? Or did you lose a pet?"
             onClick={handleTextFieldClick}
             sx={{
               maxWidth: 600,
-              mb: 5,
-              backgroundColor: "white",
+              backgroundColor: "transparent !important",
               borderRadius: "8px",
+              "& .MuiOutlinedInput-root": {
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "primary.main", // Set initial border color here
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "primary.dark", // Set hover border color
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "primary.light", // Set focused border color
+                },
+              },
             }}
           />
         </Grid>
@@ -160,15 +178,20 @@ const NewsFeed = () => {
           setPostToEdit={setPostToEdit}
         />
 
-        <Grid
-          container
-          spacing={2}
-          direction="column"
-          alignItems="center"
-          sx={{ mt: 4 }}
-        >
+        <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
           {filteredItems.map((item) => (
-            <Grid item key={item.id} sx={{ width: "100%", maxWidth: 600 }}>
+            <Grid
+              item
+              key={item.id}
+              xs={12}
+              sm={4}
+              md={4}
+              lg={4}
+              sx={{
+                width: "100%",
+                maxWidth: 500,
+              }}
+            >
               <PostCard
                 item={item}
                 fetchLostItems={fetchLostItems}

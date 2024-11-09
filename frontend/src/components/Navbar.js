@@ -36,8 +36,9 @@ const Navbar = () => {
       elevation={0}
       sx={{
         padding: "8px",
-        borderBottom: "60px solid #675BC8",
         position: "relative",
+        borderBottom: "60px solid",
+        borderColor: "primary.main",
       }}
     >
       <Toolbar>
@@ -53,13 +54,13 @@ const Navbar = () => {
           <img
             src={PurrLogo}
             alt="Logo"
-            style={{ height: "40px", marginRight: "10px" }}
+            style={{ height: "60px", marginRight: "10px" }}
           />
           <Typography
-            variant="h6"
+            variant="h4"
             component="div"
             color="primary"
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontFamily: "'Caramel', sans-serif" }}
           >
             Purr
           </Typography>
@@ -202,3 +203,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+//hellooooo

@@ -13,6 +13,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import Navbar from "./Navbar";
 
 const Signup = () => {
   const [user, setUser] = useState({
