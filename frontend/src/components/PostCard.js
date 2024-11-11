@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Card,
+  Box,
   CardContent,
   CardMedia,
   Typography,
@@ -41,8 +42,6 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
     onEdit(item);
   };
 
-  console.log(item.image);
-
   const imageSrc = item.image
     ? `data:image/png;base64,${btoa(
         new Uint8Array(item.image).reduce(
@@ -53,43 +52,86 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
     : null;
 
   return (
-    <Card>
-      <div
-        style={{ display: "flex", justifyContent: "flex-end", padding: "8px" }}
-      >
-        <IconButton onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
-        <IconButton onClick={handleDelete}>
-          <DeleteIcon />
-        </IconButton>
-      </div>
-
-      {imageSrc && (
+    <Card sx={{ height: 400, display: "flex", flexDirection: "column" }}>
+      {imageSrc ? (
         <CardMedia
           component="img"
           height="140"
           image={imageSrc}
           alt="Post image"
+          sx={{ objectFit: "cover" }}
         />
+      ) : (
+        <Box
+          sx={{
+            height: 140,
+            backgroundColor: "#f0f0f0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            No Image Available
+          </Typography>
+        </Box>
       )}
 
-      <CardContent>
+      <CardContent sx={{ flexGrow: 1, overflow: "hidden" }}>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           <Chip
             label={item.reportType === "lost" ? "Lost" : "Found"}
-            color={item.reportType === "lost" ? "secondary" : "primary"}
+            variant="outlined"
+            color="primary"
+            sx={{
+              fontWeight: "bold",
+              borderWidth: 1.5,
+              borderColor: "primary.main",
+            }}
           />
-          <Chip label={item.petCategory} color="default" />
+          <Chip
+            label={item.petCategory}
+            variant="outlined"
+            color="primary"
+            sx={{
+              fontWeight: "bold",
+              borderWidth: 1.5,
+              borderColor: "primary.main",
+            }}
+          />
         </Stack>
-        <Typography color="text.secondary">
-          Last Seen: {item.lastSeen}
+        <Typography color="primary" fontSize="12px">
+          Last Seen
         </Typography>
-        <Typography color="text.secondary">
-          Date Reported: {item.dateReported}
+        <Typography color="secondary" fontWeight="bold" sx={{ ml: 2 }}>
+          {item.lastSeen}
         </Typography>
-        <Typography>{item.description}</Typography>
+        <Typography color="primary" fontSize="12px">
+          Date Reported
+        </Typography>
+        <Typography color="secondary" fontWeight="bold" sx={{ ml: 2 }}>
+          {item.dateReported}
+        </Typography>
+        <br />
+        <Typography color="primary" fontStyle="italic" noWrap>
+          {item.description}
+        </Typography>
       </CardContent>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "8px",
+        }}
+      >
+        <IconButton color="primary" onClick={handleEdit}>
+          <EditIcon />
+        </IconButton>
+        <IconButton color="primary" onClick={handleDelete}>
+          <DeleteIcon />
+        </IconButton>
+      </div>
     </Card>
   );
 };

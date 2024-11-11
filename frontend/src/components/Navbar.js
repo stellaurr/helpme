@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation, Link } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -8,14 +9,14 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Link } from "react-router-dom";
-import PurrLogo from "../assets/logo_black.png";
+import PurrLogo from "../assets/logo_colored.png";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const location = useLocation();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,6 +26,9 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const isJoinUsActive =
+    location.pathname === "/volunteer" || location.pathname === "/about-us";
+
   return (
     <AppBar
       position="static"
@@ -32,8 +36,9 @@ const Navbar = () => {
       elevation={0}
       sx={{
         padding: "8px",
-        borderBottom: "1px solid #e0e0e0",
         position: "relative",
+        borderBottom: "60px solid",
+        borderColor: "primary.main",
       }}
     >
       <Toolbar>
@@ -43,19 +48,19 @@ const Navbar = () => {
             flexGrow: 1,
             display: "flex",
             alignItems: "center",
-            paddingLeft: "100px",
+            paddingLeft: "200px",
           }}
         >
           <img
             src={PurrLogo}
             alt="Logo"
-            style={{ height: "40px", marginRight: "10px" }}
+            style={{ height: "60px", marginRight: "10px" }}
           />
           <Typography
-            variant="h6"
+            variant="h4"
             component="div"
             color="primary"
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontFamily: "'Caramel', sans-serif" }}
           >
             Purr
           </Typography>
@@ -71,40 +76,44 @@ const Navbar = () => {
             justifyContent: "center",
           }}
         >
-          {["Adopt", "Donate", "Lost and Found"].map((text) => (
-            <Box
-              key={text}
-              component={Link}
-              to={`/${text.toLowerCase().replace(/\s/g, "-")}`}
-              sx={{
-                marginX: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "10px 20px",
-                backgroundColor: "white",
-                color: "primary.main",
-                fontWeight: "bold",
-                cursor: "pointer",
-                textDecoration: "none",
-                "&:hover": {
-                  backgroundColor: "lightgray",
-                },
-              }}
-            >
-              {text}
-            </Box>
-          ))}
+          {["Home", "Adopt", "Donate", "Lost and Found"].map((text) => {
+            const linkPath = `/${text.toLowerCase().replace(/\s/g, "-")}`;
+            const isActive = location.pathname === linkPath;
+            return (
+              <Box
+                key={text}
+                component={Link}
+                to={linkPath}
+                sx={{
+                  marginX: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 20px",
+                  borderRadius: "20px", // Rounded corners
+                  backgroundColor: isActive ? "primary.main" : "white",
+                  color: isActive ? "white" : "primary.main",
+                  fontWeight: "bold",
+                  textDecoration: "none",
+                  "&:hover": {
+                    backgroundColor: "lightgray",
+                  },
+                }}
+              >
+                {text}
+              </Box>
+            );
+          })}
           <Box
             onClick={handleMenuOpen}
             sx={{
               marginX: 1,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
               padding: "10px 20px",
-              backgroundColor: "white",
-              color: "primary.main",
+              borderRadius: "20px",
+              backgroundColor: isJoinUsActive ? "primary.main" : "white",
+              color: isJoinUsActive ? "white" : "primary.main",
               cursor: "pointer",
               fontWeight: "bold",
               "&:hover": {
@@ -120,28 +129,27 @@ const Navbar = () => {
             onClose={handleMenuClose}
           >
             <MenuItem
+              component={Link}
+              to="/volunteer"
               onClick={handleMenuClose}
               sx={{
-                padding: "10px 20px", // Consistent padding
-                color: "primary.main", // Match the color of the notification button
-                fontWeight: "bold", // Make text bold
-                borderBottom: "1px solid #e0e0e0", // Optional: border between items
-                "&:hover": {
-                  backgroundColor: "lightgray", // Same hover effect
-                },
+                padding: "10px 20px",
+                color: "primary.main",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "lightgray" },
               }}
             >
               Volunteer
             </MenuItem>
             <MenuItem
+              component={Link}
+              to="/about-us"
               onClick={handleMenuClose}
               sx={{
-                padding: "10px 20px", // Consistent padding
-                color: "primary.main", // Match the color of the notification button
-                fontWeight: "bold", // Make text bold
-                "&:hover": {
-                  backgroundColor: "lightgray", // Same hover effect
-                },
+                padding: "10px 20px",
+                color: "primary.main",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "lightgray" },
               }}
             >
               About Us
@@ -150,7 +158,9 @@ const Navbar = () => {
         </Box>
 
         {/* Right Section: Notifications and Login/Register */}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", paddingRight: "100px" }}
+        >
           <IconButton
             color="primary"
             sx={{
@@ -162,14 +172,11 @@ const Navbar = () => {
               borderRadius: "50px",
               border: "2px solid",
               borderColor: "primary.main",
-              "&:hover": {
-                backgroundColor: "lightgray",
-              },
+              "&:hover": { backgroundColor: "lightgray" },
             }}
           >
             <NotificationsIcon />
           </IconButton>
-
           <Box
             component={Link}
             to="/login"
@@ -183,14 +190,10 @@ const Navbar = () => {
               borderRadius: "50px",
               border: "2px solid",
               borderColor: "primary.main",
-              "&:hover": {
-                backgroundColor: "lightgray",
-              },
+              "&:hover": { backgroundColor: "lightgray" },
             }}
           >
-            <AccountCircleIcon
-              sx={{ marginRight: "5px", borderBlockColor: "primary" }}
-            />
+            <AccountCircleIcon sx={{ marginRight: "5px" }} />
             Login | Register
           </Box>
         </Box>
@@ -200,3 +203,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+//hellooooo
