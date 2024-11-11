@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import PurrLogo from "../assets/logo_colored.png";
+import PurrLogo from "../assets/logo_black.png";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
