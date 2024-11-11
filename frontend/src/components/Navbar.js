@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
   AppBar,
@@ -13,10 +13,13 @@ import PurrLogo from "../assets/logo_colored.png";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AuthModal from "./AuthModal";
+
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const location = useLocation();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,6 +28,9 @@ const Navbar = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+    const openAuthModal = () => setAuthModalOpen(true);
+    const closeAuthModal = () => setAuthModalOpen(false);
 
   const isJoinUsActive =
     location.pathname === "/volunteer" || location.pathname === "/about-us";
@@ -177,9 +183,8 @@ const Navbar = () => {
           >
             <NotificationsIcon />
           </IconButton>
-          <Box
+          <Box onClick={openAuthModal}
             component={Link}
-            to="/login"
             sx={{
               display: "flex",
               alignItems: "center",
@@ -197,11 +202,10 @@ const Navbar = () => {
             Login | Register
           </Box>
         </Box>
+          <AuthModal open={authModalOpen} handleClose={closeAuthModal} />
       </Toolbar>
     </AppBar>
   );
 };
 
 export default Navbar;
-
-//hellooooo
