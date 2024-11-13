@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,11 +51,17 @@ public class UserController {
 
     // Update a user by ID with profile picture support
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')") or  @com.g1appdev.Hubbits.service.UserService.isOwner(#id)")
     public ResponseEntity<UserEntity> updateUser(
             @PathVariable Long id,
             @RequestParam("user") String userJson,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+
+        if (userService.isOwnerOrAdmin(id)) {
+            // Proceed with update logic
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         try {
             UserEntity updatedUser = new ObjectMapper().readValue(userJson, UserEntity.class);
             UserEntity user = userService.updateUser(id, updatedUser, profilePicture);

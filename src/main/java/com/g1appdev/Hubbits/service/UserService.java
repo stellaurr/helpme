@@ -128,6 +128,26 @@ public class UserService {
         return false;
     }
 
+//    public boolean isOwner(Long userId) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String currentUsername = authentication.getName();
+//
+//        // Fetch the current user from the database using the username
+//        UserEntity currentUser = userRepository.findByUsername(currentUsername).orElse(null);
+//
+//        // Check if the logged-in user's ID matches the requested user ID
+//        return currentUser != null && currentUser.getUserId().equals(userId);
+//    }
+
+    public boolean isOwnerOrAdmin(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        Optional<UserEntity> currentUser = userRepository.findByUsername(currentUsername);
+
+        return currentUser.isPresent() && (currentUser.get().getUserId().equals(userId) ||
+                authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+    }
+
 
 
 

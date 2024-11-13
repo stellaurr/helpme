@@ -33,6 +33,37 @@ const Profile = () => {
         fetchUser();
     }, []);
 
+    // const fetchUser = async () => {
+    //     const token = localStorage.getItem('token');
+    //     if (!token) {
+    //         console.error("Token is missing. Please log in again.");
+    //         return;
+    //     }
+    //     try {
+    //         const response = await axios.get('http://localhost:8080/api/users/me', {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
+    //         setUser(response.data);
+    //         setEditFormData({
+    //             firstName: response.data.firstName,
+    //             lastName: response.data.lastName,
+    //             username: response.data.username,
+    //             email: response.data.email,
+    //             address: response.data.address,
+    //             phoneNumber: response.data.phoneNumber
+    //         });
+    //         if (response.data.profilePicture) {
+    //             setProfilePicture(`data:image/jpeg;base64,${response.data.profilePicture}`);
+    //         } else {
+    //             setProfilePicture(null); // No profile picture
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching user:', error);
+    //     }
+    // };
+
     const fetchUser = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -45,6 +76,7 @@ const Profile = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            console.log("API response data:", response.data); // Log API response
             setUser(response.data);
             setEditFormData({
                 firstName: response.data.firstName,
@@ -63,6 +95,7 @@ const Profile = () => {
             console.error('Error fetching user:', error);
         }
     };
+
 
     const handleEdit = () => setEditingUserId(user.userId);
 
@@ -158,8 +191,7 @@ const Profile = () => {
     }
 
     return (
-        <>
-            <Navbar />
+
             <Container>
                 <Box sx={{ mt: 5 }}>
                     <Typography variant="h4" align="center" gutterBottom>
@@ -444,7 +476,7 @@ const Profile = () => {
                     </Box>
                 </Box>
             </Container>
-        </>
+
     );
 };
 
