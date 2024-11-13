@@ -33,10 +33,13 @@ public class DonationService {
     public DonationEntity updateDonation(Long donationID, DonationEntity updatedDonation) {
         Optional<DonationEntity> donationOpt = donationRepository.findById(donationID);
         if (donationOpt.isPresent()) {
-        	DonationEntity donation = donationOpt.get();
+            DonationEntity donation = donationOpt.get();
             donation.setAmount(updatedDonation.getAmount());
             donation.setDonationDate(updatedDonation.getDonationDate());
             donation.setFrequency(updatedDonation.getFrequency());
+            donation.setFirstName(updatedDonation.getFirstName());
+            donation.setLastName(updatedDonation.getLastName());
+            donation.setSpecialMessage(updatedDonation.getSpecialMessage());
             return donationRepository.save(donation);
         }
         return null;

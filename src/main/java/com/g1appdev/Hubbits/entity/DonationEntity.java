@@ -7,24 +7,28 @@ import java.util.Date;
 @Entity
 @Table(name = "donations")
 public class DonationEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long donationID;  // donationID as the primary key
-    
-    private BigDecimal amount;  // amount with decimal precision (using BigDecimal for financial values)
-    
+    private Long donationID;
+
+    private BigDecimal amount;
+
     @Temporal(TemporalType.DATE)
-    private Date donationDate;  // date of the donation
-    
-    private String frequency;  // donation frequency (e.g., "monthly", "yearly")
-    
+    private Date donationDate;
+
+    private String frequency;
+
+    private String firstName;       // New field for the donor's first name
+    private String lastName;        // New field for the donor's last name
+    private String specialMessage;  // New field for any special message
+
     // Default constructor
     public DonationEntity() {
     }
 
-    // Getters and Setters
-    
+    // Getters and Setters for new and existing fields
+
     public Long getDonationID() {
         return donationID;
     }
@@ -55,5 +59,29 @@ public class DonationEntity {
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getSpecialMessage() {
+        return specialMessage;
+    }
+
+    public void setSpecialMessage(String specialMessage) {
+        this.specialMessage = specialMessage;
     }
 }
