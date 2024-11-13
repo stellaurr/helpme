@@ -24,7 +24,7 @@ const App = () => {
       <Menu /> {/* Add the Menu component here */}
       <Box sx={{ mt: 8 }}>
         <Routes>
-          <Route path="/admins" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/home" element={<Home />} />
           <Route path="/lost-and-found" element={<LostAndFound />} />
           <Route path="/sponsor" element={<Sponsor />} />
