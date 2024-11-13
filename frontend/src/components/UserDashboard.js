@@ -129,7 +129,6 @@ const UserDashboard = () => {
 
     return (
         <>
-            <Navbar /> {/* Add Navbar here */}
             <Container>
                 <Box sx={{ mt: 5 }}>
                     <Typography variant="h4" align="center">User Dashboard</Typography>

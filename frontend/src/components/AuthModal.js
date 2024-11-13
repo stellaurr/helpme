@@ -1,4 +1,3 @@
-// AuthModal.js
 import React, { useState } from "react";
 import {
     Button,
@@ -10,18 +9,16 @@ import {
     Typography,
     InputAdornment,
     IconButton,
-    Tabs,
-    Tab,
 } from "@mui/material";
 import { Visibility, VisibilityOff, Close } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo_colored.png";
-import authBg from "../assets/auth_bg.png"; // Import the blurred background image
+import authBg from "../assets/auth_bg.png";
 
 const AuthModal = ({ open, handleClose }) => {
     const [showPassword, setShowPassword] = useState(false);
-    const [activeTab, setActiveTab] = useState(0); // 0 for Login, 1 for Signup
+    const [isLogin, setIsLogin] = useState(true); // true for Login, false for Signup
     const navigate = useNavigate();
 
     const toggleShowPassword = () => setShowPassword(!showPassword);
@@ -80,16 +77,12 @@ const AuthModal = ({ open, handleClose }) => {
         try {
             await axios.post("http://localhost:8080/api/auth/signup", signupCredentials);
             alert("Signup successful!");
-            navigate("/login");
+            setIsLogin(true); // Switch to login form after successful signup
             handleClose();
         } catch (error) {
             alert("Error signing up");
             console.error("Error during signup:", error);
         }
-    };
-
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
     };
 
     return (
@@ -146,169 +139,184 @@ const AuthModal = ({ open, handleClose }) => {
                         <Close />
                     </IconButton>
 
-                    {/* Fixed Position Tabs */}
-                    <Box
-                        sx={{
-                            position: "absolute",
-                            top: 16,
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            width: "100%",
-                            backgroundColor: "white",
-                            zIndex: 1,
-                        }}
-                    >
-                        <Tabs
-                            value={activeTab}
-                            onChange={handleTabChange}
-                            aria-label="auth tabs"
-                            centered
-                        >
-                            <Tab label="Login" />
-                            <Tab label="Signup" />
-                        </Tabs>
-                    </Box>
-
-                    <Box sx={{ marginTop: "60px", width: '80%', textAlign: 'center' }}>
-                        {activeTab === 0 ? (
-                            // Login Form
-                            <form onSubmit={handleLoginSubmit}>
+                    <Box sx={{ marginTop: "0px", width: '80%', textAlign: 'center' }}>
+                        {isLogin ? (
+                            <>
                                 <Box mb={2}>
-                                    <img src={logo} alt="Logo" style={{ maxWidth: "60%" }} />
+                                    <img src={logo} alt="Logo" style={{ maxWidth: "40%" }} />
                                 </Box>
-                                <TextField
-                                    label="Username"
-                                    name="username"
-                                    variant="outlined"
-                                    fullWidth
-                                    margin="normal"
-                                    value={loginCredentials.username}
-                                    onChange={handleLoginChange}
-                                    required
-                                />
-                                <TextField
-                                    label="Password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    variant="outlined"
-                                    fullWidth
-                                    margin="normal"
-                                    value={loginCredentials.password}
-                                    onChange={handleLoginChange}
-                                    required
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={toggleShowPassword}>
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                                <Typography variant="h5" sx={{ mb: 3 }}>
                                     Login
-                                </Button>
-                            </form>
+                                </Typography>
+
+                                <form onSubmit={handleLoginSubmit}>
+                                    <TextField
+                                        label="Username"
+                                        name="username"
+                                        variant="outlined"
+                                        fullWidth
+                                        margin="normal"
+                                        value={loginCredentials.username}
+                                        onChange={handleLoginChange}
+                                        required
+                                    />
+                                    <TextField
+                                        label="Password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        variant="outlined"
+                                        fullWidth
+                                        margin="normal"
+                                        value={loginCredentials.password}
+                                        onChange={handleLoginChange}
+                                        required
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={toggleShowPassword}>
+                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                                        Login
+                                    </Button>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Don't have an account?{" "}
+                                        <Box
+                                            component="span"
+                                            onClick={() => setIsLogin(false)}
+                                            sx={{ color: "blue", cursor: "pointer", textDecoration: "none" }}
+                                        >
+                                            Sign up
+                                        </Box>
+                                        .
+                                    </Typography>
+                                </form>
+                            </>
                         ) : (
-                            // Signup Form
-                            <form onSubmit={handleSignupSubmit}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            label="First Name"
-                                            name="firstName"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.firstName}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
+                            <>
+                                <Typography variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
+                                    Signup
+                                </Typography>
+
+                                <form onSubmit={handleSignupSubmit}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                label="First Name"
+                                                name="firstName"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.firstName}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                label="Last Name"
+                                                name="lastName"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.lastName}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Username"
+                                                name="username"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.username}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Email"
+                                                name="email"
+                                                type="email"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.email}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Password"
+                                                name="password"
+                                                type={showPassword ? "text" : "password"}
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.password}
+                                                onChange={handleSignupChange}
+                                                required
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton onClick={toggleShowPassword}>
+                                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Address"
+                                                name="address"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.address}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Phone Number"
+                                                name="phoneNumber"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={signupCredentials.phoneNumber}
+                                                onChange={handleSignupChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Button type="submit" variant="contained" color="primary" fullWidth>
+                                                Signup
+                                            </Button>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            label="Last Name"
-                                            name="lastName"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.lastName}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Username"
-                                            name="username"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.username}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Email"
-                                            name="email"
-                                            type="email"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.email}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Password"
-                                            name="password"
-                                            type={showPassword ? "text" : "password"}
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.password}
-                                            onChange={handleSignupChange}
-                                            required
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton onClick={toggleShowPassword}>
-                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Address"
-                                            name="address"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.address}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Phone Number"
-                                            name="phoneNumber"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={signupCredentials.phoneNumber}
-                                            onChange={handleSignupChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                                            Signup
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            </form>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Already have an account?{" "}
+                                        <Box
+                                            component="span"
+                                            onClick={() => setIsLogin(true)}
+                                            sx={{ color: "blue", cursor: "pointer", textDecoration: "none" }}
+                                        >
+                                            Login
+                                        </Box>
+                                        .
+                                    </Typography>
+                                </form>
+                            </>
                         )}
                     </Box>
                 </Grid>
