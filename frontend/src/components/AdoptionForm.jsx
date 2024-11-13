@@ -7,7 +7,6 @@ const AdoptionForm = ({ onSubmit }) => {
         name: '',
         address: '',
         contactNumber: '',
-        petType: '',
         submissionDate: '',
     });
     const [successMessage, setSuccessMessage] = useState('');
@@ -20,14 +19,12 @@ const AdoptionForm = ({ onSubmit }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        
         const newAdoption = {
             ...formData,
             status: 'PENDING', 
             adoptionID: Date.now(), 
         };
 
-        
         resetForm();
 
         try {
@@ -44,7 +41,6 @@ const AdoptionForm = ({ onSubmit }) => {
             name: '',
             address: '',
             contactNumber: '',
-            petType: '',
             submissionDate: '',
         });
     };
@@ -84,24 +80,6 @@ const AdoptionForm = ({ onSubmit }) => {
                     sx={{ marginBottom: 2 }} 
                 />
                 
-                {/* Dropdown for Pet Type */}
-                <FormControl variant="outlined" fullWidth sx={{ marginBottom: 2 }}>
-                    <InputLabel id="pet-type-label">Type of Pet</InputLabel>
-                    <Select
-                        labelId="pet-type-label"
-                        name="petType"
-                        value={formData.petType}
-                        onChange={handleChange}
-                        label="Type of Pet"
-                        required
-                    >
-                        <MenuItem value="Dog">Dog</MenuItem>
-                        <MenuItem value="Bird">Bird</MenuItem>
-                        <MenuItem value="Cat">Cat</MenuItem>
-                        <MenuItem value="Hamster">Hamster</MenuItem>
-                    </Select>
-                </FormControl>
-                
                 <TextField 
                     label="Submission Date" 
                     type="date" 
@@ -125,7 +103,6 @@ const AdoptionForm = ({ onSubmit }) => {
         </div>
     );
 };
-
 
 const styles = {
     container: {

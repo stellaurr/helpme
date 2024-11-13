@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@mui/x-date-pickers": "^7.22.2",
     "cors": "^2.8.5",
     "react-router-dom": "^6.28.0",
     "scheduler": "^0.23.2"

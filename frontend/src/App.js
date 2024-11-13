@@ -19,6 +19,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import NoMatch from "./components/NoMatch";
 import Profile from "./components/Profile";
 import Navbar from "./components/Navbar";
+import PetList from "./components/PetList";
 
 const theme = createTheme({
   palette: {
@@ -42,7 +43,8 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/lost-and-found" element={<LostAndFound />} />
           <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/adopt" element={<AdoptionForm />} />
+          <Route path="/adopt" element={<PetList />} />
+          <Route path="/adoption-form" element={<AdoptionForm />} />
           <Route path="/adopt_dash" element={<AdoptionList />} />
           <Route path="/donate" element={<DonationForm />} />
           <Route path="/donation_dash" element={<DonationTable />} />
