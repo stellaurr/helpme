@@ -6,7 +6,7 @@ import { Box } from "@mui/material";
 import Home from "./components/Home";
 import LostAndFound from "./components/LostAndFound";
 import Sponsor from "./components/Sponsor";
-import Adoption from "./components/Adoption";
+import PetList from "./components/PetList"
 import Volunteer from "./components/Volunteer";
 import Login from "./components/Login";
 import VolunteerOpportunities from "./components/VolunteerOpportunities";
@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/lost-and-found" element={<LostAndFound />} />
           <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/adoption" element={<Adoption />} />
+          <Route path="/adoption" element={<PetList />} />
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin/manage-opportunities" element={<VolunteerOpportunities />} />
