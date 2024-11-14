@@ -53,7 +53,8 @@ const Navbar = () => {
     const logout = () => {
         localStorage.removeItem("token");      // Remove the token
         localStorage.removeItem("firstName");  // Remove the user's first name
-        window.location.reload();              // Reload the page to update the UI
+        // window.location.reload();              // Reload the page to update the UI
+        navigate("/home");
     };
 
     return (

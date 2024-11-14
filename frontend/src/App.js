@@ -20,7 +20,7 @@ import NoMatch from "./components/NoMatch";
 import Profile from "./components/Profile";
 import Navbar from "./components/Navbar";
 import PetList from "./components/PetList";
-
+import AdminDashboard from "./components/AdminDashboard";
 const theme = createTheme({
   palette: {
     primary: {
@@ -59,6 +59,7 @@ function App() {
           />
           <Route path="/opportunity/:id" element={<OpportunityDetail />} />
           <Route path="/book" element={<CreateOpportunity />} />
+          <Route path="/admin" element={<AdminDashboard/>} />
           
         </Routes>
       </Router>
