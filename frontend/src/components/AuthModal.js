@@ -45,6 +45,14 @@ const AuthModal = ({ open, handleClose }) => {
                 { headers: { "Content-Type": "application/json" } }
             );
             localStorage.setItem("token", response.data);
+            // Fetch the user details
+            const userResponse = await axios.get("http://localhost:8080/api/users/me", {
+                headers: { Authorization: `Bearer ${response.data}` },
+            });
+
+            // Store the first name in local storage
+            localStorage.setItem("firstName", userResponse.data.firstName);
+
             alert("Logged in successfully");
             navigate("/profile");
             handleClose();
