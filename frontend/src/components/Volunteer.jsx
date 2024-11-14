@@ -17,6 +17,8 @@ import axios from 'axios';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motion } from 'framer-motion'; // Importing motion
 import './Volunteer.css';
+import petImg from '../images/petimg.png';  // Adjust the path based on your folder structure
+import petImg2 from '../images/example.jpg'; 
 
 const Volunteer = () => {
   const [volunteerOpportunities, setVolunteerOpportunities] = useState([]);
@@ -84,15 +86,16 @@ const Volunteer = () => {
         <Grid container spacing={4} alignItems="flex-start">
           <Grid item xs={12} md={6}>
             <motion.img
-              src="src/images/petimg.png"
+              src={petImg}  // Use the imported image reference
               alt="Volunteer"
               className="img-fluid rounded"
-              style={{ width: '100%', borderRadius: '8px' }}
+              style={{ width: '100%', borderRadius: '20px' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 1 }}
             />
           </Grid>
+
           <Grid
             item
             xs={12}
@@ -189,7 +192,6 @@ const Volunteer = () => {
       </Container>
 
       {/* Volunteer Opportunities Section */}
-      {/* Volunteer Opportunities Section */}
       <Container maxWidth="lg" sx={{ padding: '1rem 0' }}>
         <Typography variant="h4" gutterBottom className="my-5" align="center" sx={{ fontWeight: 'bold', marginBottom: '2rem' }}>
           Volunteer Opportunities
@@ -213,8 +215,8 @@ const Volunteer = () => {
                   component="img"
                   alt={opportunity.title}
                   height="180"
-                  image={opportunity.imageUrl || "src/images/petimg.png"} // Use a fallback image if the opportunity has no image URL
-                  sx={{ objectFit: 'cover' }} // Keeps the image in uniform size
+                  image={opportunity.imageUrl || petImg2}  // Use the imported image reference
+                  sx={{ objectFit: 'cover' }}  // Keeps the image in uniform size
                 />
 
                 <CardContent sx={{ flexGrow: 1 }}>

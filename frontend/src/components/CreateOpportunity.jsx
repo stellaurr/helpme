@@ -59,7 +59,7 @@ const CreateOpportunity = () => {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 12, py: 4 }}> {/* Added top margin and padding */}
+    <Container maxWidth="sm" sx={{ mt: 2, py: 4 }}> {/* Added top margin and padding */}
       
       <Fade in timeout={700}>
         <Box mb={3} textAlign="center">
