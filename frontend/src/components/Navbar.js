@@ -59,6 +59,9 @@ const Navbar = () => {
         navigate("/home");
     };
 
+    const isJoinUsActive =
+        location.pathname === "/volunteer" || location.pathname === "/about-us";
+
     return (
         <AppBar
             position="static"
@@ -93,6 +96,96 @@ const Navbar = () => {
                     >
                         Purr
                     </Typography>
+                </Box>
+
+                <Box
+                    sx={{
+                        position: "absolute",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    {["Home", "Adopt", "Donate", "Lost and Found"].map((text) => {
+                        const linkPath = `/${text.toLowerCase().replace(/\s/g, "-")}`;
+                        const isActive = location.pathname === linkPath;
+                        return (
+                            <Box
+                                key={text}
+                                component={Link}
+                                to={linkPath}
+                                sx={{
+                                    marginX: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    padding: "10px 20px",
+                                    borderRadius: "20px",
+                                    backgroundColor: isActive ? "primary.main" : "white",
+                                    color: isActive ? "white" : "primary.main",
+                                    fontWeight: "bold",
+                                    textDecoration: "none",
+                                    "&:hover": {
+                                        backgroundColor: "lightgray",
+                                    },
+                                }}
+                            >
+                                {text}
+                            </Box>
+                        );
+                    })}
+                    <Box
+                        onClick={handleMenuOpen}
+                        sx={{
+                            marginX: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "10px 20px",
+                            borderRadius: "20px",
+                            backgroundColor: isJoinUsActive ? "primary.main" : "white",
+                            color: isJoinUsActive ? "white" : "primary.main",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            "&:hover": {
+                                backgroundColor: "lightgray",
+                            },
+                        }}
+                    >
+                        Join Us <ArrowDropDownIcon sx={{ marginLeft: "5px" }} />
+                    </Box>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                    >
+                        <MenuItem
+                            component={Link}
+                            to="/volunteer"
+                            onClick={handleMenuClose}
+                            sx={{
+                                padding: "10px 20px",
+                                color: "primary.main",
+                                fontWeight: "bold",
+                                "&:hover": { backgroundColor: "lightgray" },
+                            }}
+                        >
+                            Volunteer
+                        </MenuItem>
+                        <MenuItem
+                            component={Link}
+                            to="/about-us"
+                            onClick={handleMenuClose}
+                            sx={{
+                                padding: "10px 20px",
+                                color: "primary.main",
+                                fontWeight: "bold",
+                                "&:hover": { backgroundColor: "lightgray" },
+                            }}
+                        >
+                            About Us
+                        </MenuItem>
+                    </Menu>
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", paddingRight: "100px" }}>

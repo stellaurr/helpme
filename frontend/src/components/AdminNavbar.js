@@ -19,7 +19,12 @@ const AdminNavbar = ({ selectedTab, setSelectedTab }) => (
         sx={{
             width: 240,
             flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
+            position: 'relative', // Ensure it is relative to the layout
+            [`& .MuiDrawer-paper`]: {
+                width: 240,
+                boxSizing: 'border-box',
+                position: 'relative', // Stops floating above content
+            },
         }}
     >
         <List>

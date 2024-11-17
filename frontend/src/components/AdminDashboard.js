@@ -10,29 +10,32 @@ const AdminDashboard = () => {
         switch (selectedTab) {
             case 'Users':
                 return <UserDashboard />;
-            // You can add more cases here for other sections like Adoptions, Sponsorships, etc.
+            // Add more cases here for other sections like Adoptions, Sponsorships, etc.
             default:
                 return <UserDashboard />;
         }
     };
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <CssBaseline />
-            <AdminNavbar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                <Typography variant="h4" align="center">{selectedTab} Dashboard</Typography>
-                {renderContent()}
+            <Box sx={{ display: 'flex', flex: 1 }}>
+                <AdminNavbar selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+                <Box
+                    component="main"
+                    sx={{
+                        flexGrow: 1,
+                        padding: 3,
+                    }}
+                >
+                    <Typography variant="h4" align="center" sx={{ marginBottom: 2 }}>
+                        {selectedTab} Dashboard
+                    </Typography>
+                    {renderContent()}
+                </Box>
             </Box>
         </Box>
     );
-
-
-
 };
-
-
-
-
 
 export default AdminDashboard;
