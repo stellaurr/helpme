@@ -202,8 +202,25 @@ const OpportunityDetail = () => {
                             </Stack>
 
                             <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button type="submit" variant="contained" color="primary">Sign Up</Button>
-                            </Box>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                    paddingX: 4,
+                                    paddingY: 1.5,
+                                    backgroundColor: '#9B4D96',
+                                    borderRadius: '8px',
+                                    color: 'white',
+                                    '&:hover': {
+                                        backgroundColor: '#7A3B7B', // Darker purple on hover
+                                    },
+                                }}
+                            >
+                                Sign Up
+                            </Button>
+                        </Box>
+
                         </form>
                     </Paper>
                 </Grid>

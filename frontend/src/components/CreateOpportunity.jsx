@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
   Button, TextField, Container, Typography,
-  Box, Grow, Fade, Dialog, DialogTitle, DialogContent, DialogActions
-} from '@mui/material';  // Added Dialog-related imports
+  Box, Grow, Fade, Dialog, DialogTitle, DialogContent, DialogActions, Grid
+} from '@mui/material';  // Added Grid import
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -135,38 +135,46 @@ const CreateOpportunity = () => {
               },
             }}
           />
-          <TextField
-            label="Hours Worked"
-            name="hoursWorked"
-            type="number"
-            fullWidth
-            value={formData.hoursWorked}
-            onChange={handleChange}
-            required
-            margin="normal"
-            inputProps={{ min: 0 }} // Prevent negative input
-            sx={{
-              '& .MuiInputBase-root': {
-                borderRadius: '20px', // Apply more circular border radius to the input field
-              },
-            }}
-          />
-          <TextField
-            label="Volunteers Needed"
-            name="volunteersNeeded"
-            type="number"
-            fullWidth
-            value={formData.volunteersNeeded}
-            onChange={handleChange}
-            required
-            margin="normal"
-            inputProps={{ min: 0 }} // Prevent negative input
-            sx={{
-              '& .MuiInputBase-root': {
-                borderRadius: '20px', // Apply more circular border radius to the input field
-              },
-            }}
-          />
+          
+          {/* Hours Worked and Volunteers Needed on the Same Line */}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                label="Hours Worked"
+                name="hoursWorked"
+                type="number"
+                fullWidth
+                value={formData.hoursWorked}
+                onChange={handleChange}
+                required
+                margin="normal"
+                inputProps={{ min: 0 }} // Prevent negative input
+                sx={{
+                  '& .MuiInputBase-root': {
+                    borderRadius: '20px', // Apply more circular border radius to the input field
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Volunteers Needed"
+                name="volunteersNeeded"
+                type="number"
+                fullWidth
+                value={formData.volunteersNeeded}
+                onChange={handleChange}
+                required
+                margin="normal"
+                inputProps={{ min: 0 }} // Prevent negative input
+                sx={{
+                  '& .MuiInputBase-root': {
+                    borderRadius: '20px', // Apply more circular border radius to the input field
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
             <Button
