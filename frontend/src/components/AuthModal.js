@@ -15,11 +15,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo_colored.png";
 import authBg from "../assets/auth_bg.png";
+import { useUser } from '../components/UserContext';
+
 
 const AuthModal = ({ open, handleClose }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLogin, setIsLogin] = useState(true); // true for Login, false for Signup
     const navigate = useNavigate();
+    const { updateUser } = useUser();
+
 
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
@@ -51,7 +55,9 @@ const AuthModal = ({ open, handleClose }) => {
             });
 
             // Store the first name in local storage
-            localStorage.setItem("firstName", userResponse.data.firstName);
+            // localStorage.setItem("firstName", userResponse.data.firstName);
+
+            updateUser(userResponse.data);
 
             alert("Logged in successfully");
             navigate("/profile");
@@ -98,24 +104,27 @@ const AuthModal = ({ open, handleClose }) => {
             open={open}
             onClose={handleClose}
             fullWidth
-            maxWidth="md"
+            maxWidth="sm"
             sx={{
                 "& .MuiBackdrop-root": {
                     backgroundColor: "rgba(0, 0, 0, 0.5)",
                     backdropFilter: "blur(8px)",
                 },
                 "& .MuiPaper-root": {
-                    width: "auto",
+                    width: "90vw",
+                    maxWidth: "600px",
+                    height: "650px", // Set consistent height for both forms
                     borderRadius: 2,
                 },
             }}
         >
-            <Grid container component={Paper} elevation={3} sx={{ height: "70vh" }}>
+            <Grid container component={Paper} elevation={3} sx={{ height: "100%" }}>
                 {/* Background Section */}
                 <Grid
                     item
-                    xs={4}
+                    xs={12} md={4}
                     sx={{
+                        display: { xs: "none", md: "block" },
                         backgroundImage: `url(${authBg})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
@@ -125,14 +134,15 @@ const AuthModal = ({ open, handleClose }) => {
                 {/* Form Section */}
                 <Grid
                     item
-                    xs={8}
+                    xs={12} md={8}
                     sx={{
                         display: "flex",
                         flexDirection: "column",
                         position: "relative",
                         alignItems: "center",
                         justifyContent: "center",
-                        padding: 4,
+                        padding: { xs: 2, md: 4 },
+                        height: "100%", // Ensure the form section takes full height
                     }}
                 >
                     <IconButton
@@ -147,50 +157,56 @@ const AuthModal = ({ open, handleClose }) => {
                         <Close />
                     </IconButton>
 
-                    <Box sx={{ marginTop: "0px", width: '80%', textAlign: 'center' }}>
+                    <Box sx={{ width: '100%', textAlign: 'center' }}>
                         {isLogin ? (
                             <>
                                 <Box mb={2}>
-                                    <img src={logo} alt="Logo" style={{ maxWidth: "40%" }} />
+                                    <img src={logo} alt="Logo" style={{ maxWidth: "60%" }} />
                                 </Box>
                                 <Typography variant="h5" sx={{ mb: 3 }}>
                                     Login
                                 </Typography>
 
-                                <form onSubmit={handleLoginSubmit}>
-                                    <TextField
-                                        label="Username"
-                                        name="username"
-                                        variant="outlined"
-                                        fullWidth
-                                        margin="normal"
-                                        value={loginCredentials.username}
-                                        onChange={handleLoginChange}
-                                        required
-                                    />
-                                    <TextField
-                                        label="Password"
-                                        name="password"
-                                        type={showPassword ? "text" : "password"}
-                                        variant="outlined"
-                                        fullWidth
-                                        margin="normal"
-                                        value={loginCredentials.password}
-                                        onChange={handleLoginChange}
-                                        required
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={toggleShowPassword}>
-                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
-                                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-                                        Login
-                                    </Button>
+                                <form onSubmit={handleLoginSubmit} style={{ width: '100%' }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Username"
+                                                name="username"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={loginCredentials.username}
+                                                onChange={handleLoginChange}
+                                                required
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                label="Password"
+                                                name="password"
+                                                type={showPassword ? "text" : "password"}
+                                                variant="outlined"
+                                                fullWidth
+                                                value={loginCredentials.password}
+                                                onChange={handleLoginChange}
+                                                required
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton onClick={toggleShowPassword}>
+                                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Button type="submit" variant="contained" color="primary" fullWidth>
+                                                Login
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
                                     <Typography
                                         variant="body2"
                                         sx={{ mt: 2 }}
@@ -213,9 +229,9 @@ const AuthModal = ({ open, handleClose }) => {
                                     Signup
                                 </Typography>
 
-                                <form onSubmit={handleSignupSubmit}>
+                                <form onSubmit={handleSignupSubmit} style={{ width: '100%' }}>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={6}>
+                                        <Grid item xs={12} sm={6}>
                                             <TextField
                                                 label="First Name"
                                                 name="firstName"
@@ -226,7 +242,7 @@ const AuthModal = ({ open, handleClose }) => {
                                                 required
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid item xs={12} sm={6}>
                                             <TextField
                                                 label="Last Name"
                                                 name="lastName"

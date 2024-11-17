@@ -21,6 +21,8 @@ import Profile from "./components/Profile";
 import Navbar from "./components/Navbar";
 import PetList from "./components/PetList";
 import AdminDashboard from "./components/AdminDashboard";
+import { UserProvider } from "./components/UserContext";
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -29,8 +31,11 @@ const theme = createTheme({
   },
 });
 
+
+
 function App() {
   return (
+      <UserProvider>
     <ThemeProvider theme={theme}>
       <Router>
         <Navbar />
@@ -64,6 +69,7 @@ function App() {
         </Routes>
       </Router>
     </ThemeProvider>
+</UserProvider>
   );
 }
 
