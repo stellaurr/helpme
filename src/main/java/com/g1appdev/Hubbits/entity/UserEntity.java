@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
+import jakarta.validation.constraints.Size;
+
 
 @Entity
 //@AllArgsConstructor
@@ -17,10 +19,16 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(unique = true, nullable = false)
     private String username;
+
     private String firstName;
     private String lastName;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Size(min = 8, message = "Password must be at least 8 characters long.")
     private String password;
     private String address;
     private String phoneNumber;

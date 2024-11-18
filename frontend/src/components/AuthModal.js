@@ -24,6 +24,12 @@ const AuthModal = ({ open, handleClose }) => {
     const navigate = useNavigate();
     const { updateUser } = useUser();
 
+    const [usernameExists, setUsernameExists] = useState(false);
+
+    const [emailExists, setEmailExists] = useState(false);
+
+
+
 
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
@@ -80,22 +86,61 @@ const AuthModal = ({ open, handleClose }) => {
     });
 
     const handleSignupChange = (e) => {
-        setSignupCredentials({
-            ...signupCredentials,
-            [e.target.name]: e.target.value,
-        });
+        const { name, value } = e.target;
+
+        setSignupCredentials((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        // If the username field is being updated, check its availability
+        if (name === "username" && value.trim() !== "") {
+            checkUsername(value.trim());
+        }
+
+        if (name === "email" && value.trim() !== "") {
+            checkEmail(value.trim());
+        }
     };
+
 
     const handleSignupSubmit = async (e) => {
         e.preventDefault();
+
+        if (signupCredentials.password.length < 8) {
+            alert("Password must be at least 8 characters long.");
+            return;
+        }
         try {
             await axios.post("http://localhost:8080/api/auth/signup", signupCredentials);
             alert("Signup successful!");
-            setIsLogin(true); // Switch to login form after successful signup
+            setIsLogin(true);
             handleClose();
         } catch (error) {
             alert("Error signing up");
             console.error("Error during signup:", error);
+        }
+    };
+
+    const checkUsername = async (username) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/auth/check-username?username=${username}`
+            );
+            setUsernameExists(response.data); // Response will be true if username exists
+        } catch (error) {
+            console.error("Error checking username:", error);
+        }
+    };
+
+    const checkEmail = async (email) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/auth/check-email?email=${email}`
+            );
+            setEmailExists(response.data); // Response will be true if email exists
+        } catch (error) {
+            console.error("Error checking email:", error);
         }
     };
 
@@ -261,9 +306,12 @@ const AuthModal = ({ open, handleClose }) => {
                                                 fullWidth
                                                 value={signupCredentials.username}
                                                 onChange={handleSignupChange}
+                                                error={usernameExists} // Show red border if username exists
+                                                helperText={usernameExists ? "Username is already taken" : ""} // Dynamic helper text
                                                 required
                                             />
                                         </Grid>
+
                                         <Grid item xs={12}>
                                             <TextField
                                                 label="Email"
@@ -272,32 +320,49 @@ const AuthModal = ({ open, handleClose }) => {
                                                 variant="outlined"
                                                 fullWidth
                                                 value={signupCredentials.email}
-                                                onChange={handleSignupChange}
-                                                required
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                label="Password"
-                                                name="password"
-                                                type={showPassword ? "text" : "password"}
-                                                variant="outlined"
-                                                fullWidth
-                                                value={signupCredentials.password}
-                                                onChange={handleSignupChange}
-                                                required
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <IconButton onClick={toggleShowPassword}>
-                                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    ),
+                                                onChange={(e) => {
+                                                    const email = e.target.value;
+                                                    setSignupCredentials({ ...signupCredentials, email });
+
+                                                    // Check email availability
+                                                    checkEmail(email);
                                                 }}
+                                                error={emailExists} // Display error if email exists
+                                                helperText={emailExists ? "Email is already registered" : ""} // Show message if registered
+                                                required
                                             />
                                         </Grid>
                                         <Grid item xs={12}>
+                                        <TextField
+                                            label="Password"
+                                            name="password"
+                                            type={showPassword ? "text" : "password"}
+                                            variant="outlined"
+                                            fullWidth
+                                            value={signupCredentials.password}
+                                            onChange={(e) => {
+                                                setSignupCredentials({ ...signupCredentials, password: e.target.value });
+                                            }}
+                                            error={signupCredentials.password.length > 0 && signupCredentials.password.length < 8}
+                                            helperText={
+                                                signupCredentials.password.length > 0 && signupCredentials.password.length < 8
+                                                    ? "Password must be at least 8 characters long."
+                                                    : ""
+                                            }
+                                            required
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton onClick={toggleShowPassword}>
+                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
                                             <TextField
                                                 label="Address"
                                                 name="address"
@@ -320,7 +385,13 @@ const AuthModal = ({ open, handleClose }) => {
                                             />
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <Button type="submit" variant="contained" color="primary" fullWidth>
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary"
+                                                fullWidth
+                                                disabled={usernameExists || emailExists} // Disable if username or email exists
+                                            >
                                                 Signup
                                             </Button>
                                         </Grid>

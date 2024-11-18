@@ -53,6 +53,15 @@ public class UserService {
     }
 
     public UserEntity createUser(UserEntity user) {
+
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists.");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists.");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Encode the password
         return userRepository.save(user);
     }
@@ -128,16 +137,6 @@ public class UserService {
         return false;
     }
 
-//    public boolean isOwner(Long userId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentUsername = authentication.getName();
-//
-//        // Fetch the current user from the database using the username
-//        UserEntity currentUser = userRepository.findByUsername(currentUsername).orElse(null);
-//
-//        // Check if the logged-in user's ID matches the requested user ID
-//        return currentUser != null && currentUser.getUserId().equals(userId);
-//    }
 
     public boolean isOwnerOrAdmin(Long userId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -146,6 +145,14 @@ public class UserService {
 
         return currentUser.isPresent() && (currentUser.get().getUserId().equals(userId) ||
                 authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
 
