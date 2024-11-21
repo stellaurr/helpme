@@ -26,6 +26,8 @@ const Profile = () => {
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
 
     useEffect(() => {
         if (user) {
@@ -37,6 +39,7 @@ const Profile = () => {
                 address: user.address,
                 phoneNumber: user.phoneNumber,
             });
+            setProfilePicture(user.profilePicture);
         }
     }, [user]);
 
@@ -67,6 +70,7 @@ const Profile = () => {
     };
 
     const handleSaveEdit = async () => {
+        setIsSaving(true);
         const token = localStorage.getItem('token');
         if (!token) {
             console.error("Token is missing. Please log in again.");
@@ -90,15 +94,26 @@ const Profile = () => {
             );
             if (response.status === 200) {
                 console.log("User updated successfully");
-                updateUser(response.data); // Update the user context with the new user data
-                setEditingUserId(null);
+                // Dynamically fetch the updated user data
+                const updatedResponse = await axios.get(`http://localhost:8080/api/users/me`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (updatedResponse.status === 200) {
+                    updateUser(updatedResponse.data); // Update context with the updated user data
+                    setProfilePicture(updatedResponse.data.profilePicture); // Set new profile picture
+                    setEditingUserId(null);
+                }
             } else {
                 console.error("Failed to update user");
             }
         } catch (error) {
             console.error("Error saving user:", error);
         }
+
+        setIsSaving(false);
     };
+
+
 
     const handlePasswordChange = async () => {
         if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -157,7 +172,13 @@ const Profile = () => {
                     }}
                 >
                     <Avatar
-                        src={profilePicture && typeof profilePicture === 'string' ? profilePicture : null}
+                        src={
+                            profilePicture
+                                ? (typeof profilePicture === "string" ? profilePicture : URL.createObjectURL(profilePicture))
+                                : user.profilePicture
+                                    ? `data:image/jpeg;base64,${user.profilePicture}`
+                                    : null
+                        }
                         alt="Profile Picture"
                         sx={{
                             width: 120,
@@ -167,7 +188,7 @@ const Profile = () => {
                             fontSize: '48px',
                         }}
                     >
-                        {profilePicture ? '' : user.firstName ? user.firstName[0] : ''}
+                        {(!profilePicture && !user.profilePicture) && (user.firstName ? user.firstName[0] : '')}
                     </Avatar>
 
                     <Box sx={{ flexGrow: 1 }}>
@@ -249,8 +270,13 @@ const Profile = () => {
                                         style={{ margin: '20px 0' }}
                                     />
                                     <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                                        <Button variant="contained" color="primary" onClick={handleSaveEdit}>
-                                            Save
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={handleSaveEdit}
+                                            disabled={isSaving}
+                                        >
+                                            {isSaving ? "Saving..." : "Save"}
                                         </Button>
                                         <Button variant="outlined" color="secondary" onClick={handleCancelEdit}>
                                             Cancel

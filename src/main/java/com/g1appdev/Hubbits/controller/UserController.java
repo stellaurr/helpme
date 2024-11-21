@@ -40,11 +40,32 @@ public class UserController {
     }
 
     // Get a user by ID
+//    @GetMapping("/{id}")
+//    public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
+//        Optional<UserEntity> user = userService.findUserById(id);
+//        if (user.isPresent()) {
+//            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
         Optional<UserEntity> user = userService.findUserById(id);
         if (user.isPresent()) {
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+            UserEntity foundUser = user.get();
+            Map<String, Object> response = Map.of(
+                    "userId", foundUser.getUserId(),
+                    "username", foundUser.getUsername(),
+                    "firstName", foundUser.getFirstName(),
+                    "lastName", foundUser.getLastName(),
+                    "email", foundUser.getEmail(),
+                    "address", foundUser.getAddress(),
+                    "phoneNumber", foundUser.getPhoneNumber(),
+                    "role", foundUser.getRole(),
+                    "profilePicture", foundUser.getProfilePictureBase64() // Send Base64 encoded profile picture
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -91,8 +112,27 @@ public class UserController {
 
 
     // Get the currently authenticated user
+//    @GetMapping("/me")
+//    public ResponseEntity<UserEntity> getCurrentUser() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String currentUsername = authentication != null ? authentication.getName() : null;
+//
+//        if (currentUsername == null) {
+//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//        }
+//
+//        Optional<UserEntity> user = userService.findByUsername(currentUsername);
+//        if (user.isPresent()) {
+//            System.out.println("User found: " + user.get().getUsername());  // Log username to verify
+//            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+//        } else {
+//            System.out.println("User not found for username: " + currentUsername);  // Log missing user
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
+
     @GetMapping("/me")
-    public ResponseEntity<UserEntity> getCurrentUser() {
+    public ResponseEntity<Map<String, Object>> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication != null ? authentication.getName() : null;
 
@@ -102,13 +142,24 @@ public class UserController {
 
         Optional<UserEntity> user = userService.findByUsername(currentUsername);
         if (user.isPresent()) {
-            System.out.println("User found: " + user.get().getUsername());  // Log username to verify
-            return new ResponseEntity<>(user.get(), HttpStatus.OK);
+            UserEntity foundUser = user.get();
+            Map<String, Object> response = Map.of(
+                    "userId", foundUser.getUserId(),
+                    "username", foundUser.getUsername(),
+                    "firstName", foundUser.getFirstName(),
+                    "lastName", foundUser.getLastName(),
+                    "email", foundUser.getEmail(),
+                    "address", foundUser.getAddress(),
+                    "phoneNumber", foundUser.getPhoneNumber(),
+                    "role", foundUser.getRole(),
+                    "profilePicture", foundUser.getProfilePictureBase64() // Send Base64 encoded profile picture
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            System.out.println("User not found for username: " + currentUsername);  // Log missing user
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody Map<String, String> passwordData) {

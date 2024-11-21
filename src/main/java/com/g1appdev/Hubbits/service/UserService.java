@@ -44,9 +44,16 @@ public class UserService {
         return new User(userEntity.getUsername(), userEntity.getPassword(), new ArrayList<>());
     }
 
+//    public Optional<UserEntity> findByUsername(String username) {
+//        return userRepository.findByUsername(username);
+//    }
+
     public Optional<UserEntity> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+        user.ifPresent(u -> System.out.println("Fetched profile picture: " + (u.getProfilePicture() != null)));
+        return user;
     }
+
 
     public UserEntity findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);

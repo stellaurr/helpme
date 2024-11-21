@@ -125,13 +125,19 @@ public class UserEntity {
         this.createdAt = createdAt;
     }
 
-//    public byte[] getProfilePicture() {
-//        return profilePicture;
-//    }
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+
+
 
     public String getProfilePictureBase64() {
-        return profilePicture != null ? Base64.getEncoder().encodeToString(profilePicture) : null;
+        if (profilePicture != null && profilePicture.length > 0) {
+            return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(profilePicture);
+        }
+        return null;
     }
+
 
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
