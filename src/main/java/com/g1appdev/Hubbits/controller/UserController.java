@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-<<<<<<< HEAD
-=======
 import java.util.Base64;
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,13 +144,10 @@ public class UserController {
         Optional<UserEntity> user = userService.findByUsername(currentUsername);
         if (user.isPresent()) {
             UserEntity foundUser = user.get();
-<<<<<<< HEAD
-=======
             String profilePictureBase64 = foundUser.getProfilePicture() != null
                     ? Base64.getEncoder().encodeToString(foundUser.getProfilePicture())
                     : ""; // Default to empty string if profile picture is null
 
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
             Map<String, Object> response = Map.of(
                     "userId", foundUser.getUserId(),
                     "username", foundUser.getUsername(),
@@ -163,11 +157,7 @@ public class UserController {
                     "address", foundUser.getAddress(),
                     "phoneNumber", foundUser.getPhoneNumber(),
                     "role", foundUser.getRole(),
-<<<<<<< HEAD
-                    "profilePicture", foundUser.getProfilePictureBase64() // Send Base64 encoded profile picture
-=======
                     "profilePicture", profilePictureBase64 // Send Base64 encoded or default empty string
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
             );
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -176,10 +166,6 @@ public class UserController {
     }
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody Map<String, String> passwordData) {
         String oldPassword = passwordData.get("oldPassword");
