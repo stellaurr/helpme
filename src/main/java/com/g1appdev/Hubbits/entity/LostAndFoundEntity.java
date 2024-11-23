@@ -29,17 +29,22 @@ public class LostAndFoundEntity {
     @Lob // Indicates that this is a large object
     @Column(name = "imagedata") // Column name in the database
     private byte[] image; // Store image data as byte array
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")  // Foreign key to associate with UserEntity
+    private UserEntity user;
 
     // Default constructor
     public LostAndFoundEntity() {}
 
     // Constructor with all parameters except reportID
-    public LostAndFoundEntity(String reportType, Date dateReported, String lastSeen, String description, byte[] image) {
+    public LostAndFoundEntity(String reportType, Date dateReported, String lastSeen, String description, byte[] image, UserEntity user) {
         this.reportType = reportType;
         this.dateReported = dateReported;
         this.lastSeen = lastSeen;
         this.description = description;
         this.image = image; // Initialize the image field
+        this.user = user;   // Initialize the user field
     }
 
     // Getters and Setters
@@ -55,16 +60,16 @@ public class LostAndFoundEntity {
         return reportType;
     }
 
-    public void setPetCategory(String petCategory) {
-        this.petCategory = petCategory;
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
     }
 
     public String getPetCategory() {
         return petCategory;
     }
 
-    public void setReportType(String reportType) {
-        this.reportType = reportType;
+    public void setPetCategory(String petCategory) {
+        this.petCategory = petCategory;
     }
 
     public Date getDateReported() {
@@ -97,5 +102,13 @@ public class LostAndFoundEntity {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }

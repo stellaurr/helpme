@@ -17,21 +17,34 @@ const NewsFeed = () => {
   const [lostItems, setLostItems] = useState([]);
   const [postToEdit, setPostToEdit] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchLostItems = async () => {
+    const token = localStorage.getItem("token"); // Retrieve the token from localStorage
+    if (!token) {
+      alert("You must log in to view lost items.");
+      return;
+    }
+
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/lostandfound"
-      );
-      setLostItems(response.data);
+      const response = await axios.get("http://localhost:8080/api/lostandfound", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Attach the JWT token
+        },
+      });
+      setLostItems(response.data); // Update the state with fetched items
     } catch (error) {
       console.error("Error fetching lost items:", error);
+      if (error.response?.status === 403) {
+        alert("Access denied. Please check your permissions.");
+      } else {
+        alert("Failed to fetch lost items. Try again later.");
+      }
     }
   };
 
   useEffect(() => {
-    fetchLostItems();
+    fetchLostItems(); // Fetch items on component mount
   }, []);
 
   const handleTextFieldClick = () => {
@@ -48,9 +61,10 @@ const NewsFeed = () => {
   };
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value); // Update the search query state
+    setSearchQuery(event.target.value);
   };
 
+  // Filter items based on search query
   const filteredItems = lostItems.filter(
     (item) =>
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,6 +74,7 @@ const NewsFeed = () => {
 
   return (
     <>
+      {/* Search Box */}
       <Box
         sx={{
           position: "absolute",
@@ -80,7 +95,6 @@ const NewsFeed = () => {
           sx={{
             width: "100%",
             backgroundColor: "transparent",
-
             "& .MuiOutlinedInput-root": {
               height: "35px",
               border: "1px solid white",
@@ -104,7 +118,6 @@ const NewsFeed = () => {
               <Button
                 sx={{ padding: 0, backgroundColor: "transparent !important" }}
               >
-                {" "}
                 <SearchIcon />
               </Button>
             ),
@@ -131,6 +144,7 @@ const NewsFeed = () => {
           </Typography>
         </Grid>
 
+        {/* Create Post */}
         <Grid
           container
           justifyContent="center"
@@ -155,19 +169,20 @@ const NewsFeed = () => {
               borderRadius: "8px",
               "& .MuiOutlinedInput-root": {
                 "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main", // Set initial border color here
+                  borderColor: "primary.main",
                 },
                 "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.dark", // Set hover border color
+                  borderColor: "primary.dark",
                 },
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.light", // Set focused border color
+                  borderColor: "primary.light",
                 },
               },
             }}
           />
         </Grid>
 
+        {/* Post Dialog */}
         <CreatePostDialog
           open={openDialog}
           setOpen={setOpenDialog}
@@ -178,6 +193,7 @@ const NewsFeed = () => {
           setPostToEdit={setPostToEdit}
         />
 
+        {/* Display Lost Items */}
         <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
           {filteredItems.map((item) => (
             <Grid

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogTitle,
   Grid,
   TextField,
-  Button,
   ToggleButton,
   ToggleButtonGroup,
   Box,
@@ -23,6 +23,7 @@ const CreatePostDialog = ({
 }) => {
   const [formData, setFormData] = useState({
     reportType: "lost",
+    petCategory: "",
     dateReported: "",
     lastSeen: "",
     description: "",
@@ -32,12 +33,12 @@ const CreatePostDialog = ({
   useEffect(() => {
     if (isEditing && postToEdit) {
       setFormData({
-        reportType: postToEdit.reportType || "",
+        reportType: postToEdit.reportType || "lost",
         petCategory: postToEdit.petCategory || "",
         dateReported: postToEdit.dateReported || "",
         lastSeen: postToEdit.lastSeen || "",
         description: postToEdit.description || "",
-        imageData: postToEdit.imageFile || null,
+        imageData: postToEdit.image || null,
       });
     } else {
       setFormData({
@@ -67,15 +68,13 @@ const CreatePostDialog = ({
   };
 
   const handleSubmit = async (e) => {
-    if (isEditing) {
-      const confirmed = window.confirm(
-        "Are you sure you want to update this post?"
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
     e.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must be logged in to create a post.");
+      return;
+    }
 
     const dataToSubmit = new FormData();
     dataToSubmit.append("reportType", formData.reportType);
@@ -83,7 +82,6 @@ const CreatePostDialog = ({
     dataToSubmit.append("dateReported", formData.dateReported);
     dataToSubmit.append("lastSeen", formData.lastSeen);
     dataToSubmit.append("description", formData.description);
-
     if (formData.imageData) {
       dataToSubmit.append("imageFile", formData.imageData);
     }
@@ -97,31 +95,30 @@ const CreatePostDialog = ({
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log("Report updated:", response.data);
+        console.log("Post updated:", response.data);
       } else {
         response = await axios.post(
-          `http://localhost:8080/api/lostandfound`,
+          "http://localhost:8080/api/lostandfound",
           dataToSubmit,
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log("Report created:", response.data);
+        console.log("Post created:", response.data);
       }
 
       fetchLostItems();
       setOpen(false);
     } catch (error) {
-      console.error("Error updating report:", error);
-      alert(
-        "Error updating report: " +
-          (error.response?.data?.message || error.message)
-      );
+      console.error("Error creating/updating post:", error);
+      alert("Failed to create/update the post. Please try again.");
     }
   };
 
@@ -299,39 +296,28 @@ const CreatePostDialog = ({
               />
             </Grid>
             <Grid item xs={12}>
-              {!isEditing && (
-                <input
-                  type="file"
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  required
-                />
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              <Grid item xs={12}>
-                <Box display="flex" justifyContent="center">
-                  <ToggleButton
-                    onclick={handleSubmit}
-                    sx={{
-                      border: "2px solid",
-                      borderRadius: "8px",
-                      padding: "12px 36px",
-                      borderColor: "primary.main",
-                      backgroundColor: "primary.main",
-                      color: "#fff",
-                      "&:hover": {
-                        backgroundColor: "white",
-                        color: "primary.main",
-                      },
-                    }}
-                  >
-                    Submit
-                  </ToggleButton>
-                </Box>
-              </Grid>
+              <input
+                type="file"
+                onChange={handleImageUpload}
+                accept="image/*"
+              />
             </Grid>
           </Grid>
+
+          <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+              sx={{
+                padding: "10px 20px",
+                borderRadius: "8px",
+                fontWeight: "bold",
+              }}
+            >
+              {isEditing ? "Update Post" : "Create Post"}
+            </Button>
+          </Box>
         </Box>
       </DialogContent>
     </Dialog>

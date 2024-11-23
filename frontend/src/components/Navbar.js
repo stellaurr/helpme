@@ -224,7 +224,7 @@ const Navbar = () => {
                                 }}
                             >
                                 <AccountCircleIcon sx={{ marginRight: "5px" }} />
-                                {user.firstName}
+                                {user.username}
                             </Box>
                             <Menu
                                 anchorEl={profileAnchorEl}

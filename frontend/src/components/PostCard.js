@@ -116,6 +116,9 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
         <Typography color="primary" fontStyle="italic" noWrap>
           {item.description}
         </Typography>
+        <Typography color="primary" fontSize="12px" mt={2}>
+          Posted by: <strong>{item.postedBy}</strong>
+        </Typography>
       </CardContent>
 
       <div

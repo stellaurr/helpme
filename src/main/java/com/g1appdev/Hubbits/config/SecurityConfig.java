@@ -40,7 +40,8 @@ public class SecurityConfig {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter, JwtUtil jwtUtil, UserService userService, PasswordEncoder passwordEncoder) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter,
+            JwtUtil jwtUtil, UserService userService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtUtil = jwtUtil;
@@ -55,11 +56,13 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/users", "/api/lostandfound","/api/users/me","api/admin").permitAll()
+                .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/users", "/api/lostandfound",
+                        "/api/users/me", "api/admin")
+                .permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/users/**").authenticated()
-                .anyRequest().permitAll() //.authenticated() when applying admin
+                .anyRequest().permitAll() // .authenticated() when applying admin
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -70,7 +73,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManagerBuilder authenticationManagerBuilder = http
+                .getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder);
         return authenticationManagerBuilder.build();
     }
@@ -90,8 +94,6 @@ public class SecurityConfig {
             }
         };
     }
-
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
