@@ -173,8 +173,8 @@ const Profile = () => {
                 >
                     <Avatar
                         src={
-                            profilePicture
-                                ? (typeof profilePicture === "string" ? profilePicture : URL.createObjectURL(profilePicture))
+                            profilePicture instanceof File || profilePicture instanceof Blob
+                                ? URL.createObjectURL(profilePicture)
                                 : user.profilePicture
                                     ? `data:image/jpeg;base64,${user.profilePicture}`
                                     : null
