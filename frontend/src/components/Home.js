@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Snackbar, Grid, Card, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ToggleButton } from '@mui/material';
 import axios from 'axios';
@@ -114,11 +115,7 @@ const Home = () => {
             Open your heart and your home to a shelter pet.
           </Typography>
           <Box sx={{ display: 'flex', gap: 4 }}>
-<<<<<<< HEAD
-            <ToggleButton
-=======
             <ToggleButton value="adopt"
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
               onClick={handleAdoptNowClick} // Add the handleAdoptNowClick function here
               sx={{
                 border: '2px solid',
@@ -136,11 +133,7 @@ const Home = () => {
               Adopt Now
             </ToggleButton>
 
-<<<<<<< HEAD
-            <ToggleButton
-=======
             <ToggleButton value="adopt"
->>>>>>> 4d326988862357c33482eac4ae7153a9687e5ada
               onClick={handleSubmit}
               sx={{
                 border: '2px solid',
