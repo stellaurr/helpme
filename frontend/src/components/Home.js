@@ -114,7 +114,7 @@ const Home = () => {
             Open your heart and your home to a shelter pet.
           </Typography>
           <Box sx={{ display: 'flex', gap: 4 }}>
-            <ToggleButton
+            <ToggleButton value="adopt"
               onClick={handleAdoptNowClick} // Add the handleAdoptNowClick function here
               sx={{
                 border: '2px solid',
@@ -132,7 +132,7 @@ const Home = () => {
               Adopt Now
             </ToggleButton>
 
-            <ToggleButton
+            <ToggleButton value="adopt"
               onClick={handleSubmit}
               sx={{
                 border: '2px solid',
