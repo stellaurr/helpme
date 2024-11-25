@@ -3,7 +3,6 @@ import {
   Card,
   Box,
   CardContent,
-  CardMedia,
   Typography,
   IconButton,
   Stack,
@@ -21,9 +20,9 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
     if (!confirmed) return;
 
     try {
-      if (item?.reportID) {
+      if (item?.reportid) {
         await axios.delete(
-          `http://localhost:8080/api/lostandfound/${item.reportID}`
+          `http://localhost:8080/api/lostandfound/${item.reportid}`
         );
         alert("Item deleted successfully");
         fetchLostItems();
@@ -42,33 +41,42 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
     onEdit(item);
   };
 
-  const imageSrc = item.image
-    ? `data:image/png;base64,${btoa(
-        new Uint8Array(item.image).reduce(
-          (data, byte) => data + String.fromCharCode(byte),
-          ""
-        )
-      )}`
-    : null;
+  // Handle imageSrc based on byte array or base64 string
+  const imageSrc =
+    item.image && typeof item.image === "string"
+      ? `data:image/png;base64,${item.image}`
+      : item.image
+      ? `data:image/png;base64,${btoa(
+          String.fromCharCode(...new Uint8Array(item.image))
+        )}`
+      : null;
 
   return (
     <Card sx={{ height: 400, display: "flex", flexDirection: "column" }}>
       {imageSrc ? (
-        <CardMedia
+        <Box
           component="img"
-          height="140"
-          image={imageSrc}
-          alt="Post image"
-          sx={{ objectFit: "cover" }}
+          src={imageSrc}
+          alt="Post Image"
+          sx={{
+            height: 140,
+            width: "100%",
+            objectFit: "cover",
+            borderTopLeftRadius: "4px",
+            borderTopRightRadius: "4px",
+          }}
         />
       ) : (
         <Box
           sx={{
             height: 140,
+            width: "100%",
             backgroundColor: "#f0f0f0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            borderTopLeftRadius: "4px",
+            borderTopRightRadius: "4px",
           }}
         >
           <Typography variant="body2" color="text.secondary">
@@ -80,7 +88,7 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
       <CardContent sx={{ flexGrow: 1, overflow: "hidden" }}>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           <Chip
-            label={item.reportType === "lost" ? "Lost" : "Found"}
+            label={item.reporttype === "lost" ? "Lost" : "Found"}
             variant="outlined"
             color="primary"
             sx={{
@@ -90,7 +98,7 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
             }}
           />
           <Chip
-            label={item.petCategory}
+            label={item.petcategory}
             variant="outlined"
             color="primary"
             sx={{
@@ -104,20 +112,17 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
           Last Seen
         </Typography>
         <Typography color="secondary" fontWeight="bold" sx={{ ml: 2 }}>
-          {item.lastSeen}
+          {item.lastseen}
         </Typography>
         <Typography color="primary" fontSize="12px">
           Date Reported
         </Typography>
         <Typography color="secondary" fontWeight="bold" sx={{ ml: 2 }}>
-          {item.dateReported}
+          {item.datereported}
         </Typography>
         <br />
         <Typography color="primary" fontStyle="italic" noWrap>
           {item.description}
-        </Typography>
-        <Typography color="primary" fontSize="12px" mt={2}>
-          Posted by: <strong>{item.postedBy}</strong>
         </Typography>
       </CardContent>
 

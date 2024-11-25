@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
   Grid,
   TextField,
+  Button,
   ToggleButton,
   ToggleButtonGroup,
   Box,
@@ -22,35 +22,43 @@ const CreatePostDialog = ({
   isEditing,
 }) => {
   const [formData, setFormData] = useState({
-    reportType: "lost",
-    petCategory: "",
-    dateReported: "",
-    lastSeen: "",
+    reporttype: "lost",
+    datereported: "",
+    lastseen: "",
     description: "",
-    imageData: null,
+    imagedata: null,
   });
 
+  const [previewImage, setPreviewImage] = useState(null); // Move this inside the component
+
   useEffect(() => {
-    if (isEditing && postToEdit) {
-      setFormData({
-        reportType: postToEdit.reportType || "lost",
-        petCategory: postToEdit.petCategory || "",
-        dateReported: postToEdit.dateReported || "",
-        lastSeen: postToEdit.lastSeen || "",
-        description: postToEdit.description || "",
-        imageData: postToEdit.image || null,
-      });
-    } else {
-      setFormData({
-        reportType: "lost",
-        petCategory: "",
-        dateReported: "",
-        lastSeen: "",
-        description: "",
-        imageData: null,
-      });
+  if (isEditing && postToEdit) {
+    setFormData({
+      reporttype: postToEdit.reporttype || "lost", // Fallback to "lost"
+      petcategory: postToEdit.petcategory || "",
+      datereported: postToEdit.datereported || "",
+      lastseen: postToEdit.lastseen || "",
+      description: postToEdit.description || "",
+      imagedata: postToEdit.imagefile || null,
+    });
+
+    // Set preview image if editing and image exists
+    if (postToEdit.imagefile) {
+      const previewUrl = URL.createObjectURL(postToEdit.imagefile);
+      setPreviewImage(previewUrl);
     }
-  }, [isEditing, postToEdit, open]);
+  } else {
+    setFormData({
+      reporttype: "lost",
+      petcategory: "",
+      datereported: "",
+      lastseen: "",
+      description: "",
+      imagedata: null,
+    });
+    setPreviewImage(null); // Clear the preview for a new post
+  }
+}, [isEditing, postToEdit, open]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,67 +66,56 @@ const CreatePostDialog = ({
   };
 
   const handleImageUpload = (e) => {
-    setFormData({ ...formData, imageData: e.target.files[0] });
-  };
+  const file = e.target.files[0];
+  if (file && file.type.startsWith("image/")) {
+    setFormData({ ...formData, imagedata: file }); // Maintain consistent naming
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+  } else {
+    alert("Please upload a valid image file.");
+  }
+};
+
 
   const handleReportTypeChange = (event, newReportType) => {
     if (newReportType) {
-      setFormData({ ...formData, reportType: newReportType });
+      setFormData({ ...formData, reporttype: newReportType });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must be logged in to create a post.");
-      return;
+    const dataToSubmit = new FormData();
+    dataToSubmit.append("reporttype", formData.reporttype || "lost");
+    dataToSubmit.append("petcategory", formData.petcategory);
+    dataToSubmit.append("datereported", formData.datereported);
+    dataToSubmit.append("lastseen", formData.lastseen);
+    dataToSubmit.append("description", formData.description);
+
+    if (formData.imagedata) {
+      dataToSubmit.append("imagefile", formData.imagedata);
     }
 
-    const dataToSubmit = new FormData();
-    dataToSubmit.append("reportType", formData.reportType);
-    dataToSubmit.append("petCategory", formData.petCategory);
-    dataToSubmit.append("dateReported", formData.dateReported);
-    dataToSubmit.append("lastSeen", formData.lastSeen);
-    dataToSubmit.append("description", formData.description);
-    if (formData.imageData) {
-      dataToSubmit.append("imageFile", formData.imageData);
-    }
 
     try {
-      let response;
-      if (isEditing) {
-        response = await axios.put(
-          `http://localhost:8080/api/lostandfound/${postToEdit.reportID}`,
-          dataToSubmit,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Post updated:", response.data);
-      } else {
-        response = await axios.post(
-          "http://localhost:8080/api/lostandfound",
-          dataToSubmit,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Post created:", response.data);
-      }
+      const url = isEditing
+         ? `http://localhost:8080/api/lostandfound/${postToEdit.reportid}`
+        : `http://localhost:8080/api/lostandfound`;
 
+      const method = isEditing ? "put" : "post";
+      const response = await axios[method](url, dataToSubmit, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log(isEditing ? "Report updated" : "Report created", response.data);
       fetchLostItems();
       setOpen(false);
     } catch (error) {
-      console.error("Error creating/updating post:", error);
-      alert("Failed to create/update the post. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to submit the post.");
     }
   };
 
@@ -173,7 +170,7 @@ const CreatePostDialog = ({
       >
         <Box display="flex" flexDirection="column" alignItems="center">
           <ToggleButtonGroup
-            value={formData.reportType}
+            value={formData.reporttype || "lost"}
             exclusive
             onChange={handleReportTypeChange}
             aria-label="Report Type"
@@ -192,8 +189,8 @@ const CreatePostDialog = ({
                 borderRadius: "8px",
                 padding: "12px 36px",
                 borderColor:
-                  formData.reportType === "lost" ? "primary.main" : "grey.500",
-                color: formData.reportType === "lost" ? "#fff" : "grey.500",
+                  formData.reporttype === "lost" ? "primary.main" : "grey.500",
+                color: formData.reporttype === "lost" ? "#fff" : "grey.500",
                 backgroundColor:
                   formData.reportType === "lost"
                     ? "primary.main"
@@ -204,7 +201,7 @@ const CreatePostDialog = ({
                 },
                 "&:hover": {
                   backgroundColor:
-                    formData.reportType === "lost"
+                    formData.reporttype === "lost"
                       ? "primary.dark"
                       : "rgba(0, 0, 0, 0.04)",
                 },
@@ -212,7 +209,6 @@ const CreatePostDialog = ({
             >
               Lost
             </ToggleButton>
-
             <ToggleButton
               value="found"
               aria-label="Found"
@@ -221,10 +217,10 @@ const CreatePostDialog = ({
                 borderRadius: "8px",
                 padding: "12px 36px",
                 borderColor:
-                  formData.reportType === "found" ? "primary.main" : "grey.500",
-                color: formData.reportType === "found" ? "#fff" : "grey.500",
+                  formData.reporttype === "found" ? "primary.main" : "grey.500",
+                color: formData.reporttype === "found" ? "#fff" : "grey.500",
                 backgroundColor:
-                  formData.reportType === "found"
+                  formData.reporttype === "found"
                     ? "primary.main"
                     : "transparent",
                 "&.Mui-selected": {
@@ -233,7 +229,7 @@ const CreatePostDialog = ({
                 },
                 "&:hover": {
                   backgroundColor:
-                    formData.reportType === "found"
+                    formData.reporttype === "found"
                       ? "primary.dark"
                       : "rgba(0, 0, 0, 0.04)",
                 },
@@ -242,14 +238,14 @@ const CreatePostDialog = ({
               Found
             </ToggleButton>
           </ToggleButtonGroup>
-
+          {/* Form Fields */}
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                name="petCategory"
+                name="petcategory"
                 label="Pet Type"
                 fullWidth
-                value={formData.petCategory}
+                value={formData.petcategory}
                 onChange={handleInputChange}
                 InputLabelProps={{
                   shrink: true,
@@ -258,11 +254,11 @@ const CreatePostDialog = ({
             </Grid>
             <Grid item xs={12}>
               <TextField
-                name="dateReported"
+                name="datereported"
                 label="Date Reported"
                 type="date"
                 fullWidth
-                value={formData.dateReported}
+                value={formData.datereported}
                 onChange={handleInputChange}
                 InputLabelProps={{
                   shrink: true,
@@ -271,10 +267,10 @@ const CreatePostDialog = ({
             </Grid>
             <Grid item xs={12}>
               <TextField
-                name="lastSeen"
+                name="lastseen"
                 label="Last Seen"
                 fullWidth
-                value={formData.lastSeen}
+                value={formData.lastseen}
                 onChange={handleInputChange}
                 InputLabelProps={{
                   shrink: true,
@@ -296,28 +292,52 @@ const CreatePostDialog = ({
               />
             </Grid>
             <Grid item xs={12}>
+              <Typography>Upload Image:</Typography>
               <input
                 type="file"
                 onChange={handleImageUpload}
                 accept="image/*"
               />
+              {previewImage && (
+                <Box mt={2}>
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    style={{
+                      maxWidth: "100%",
+                      height: "auto",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                    }}
+                  />
+                </Box>
+              )}
             </Grid>
+            <Grid item xs={12}>
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="center">
+                  <ToggleButton
+                    onClick={handleSubmit}
+                    sx={{
+                      border: "2px solid",
+                      borderRadius: "8px",
+                      padding: "12px 36px",
+                      borderColor: "primary.main",
+                      backgroundColor: "primary.main",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "white",
+                        color: "primary.main",
+                      },
+                    }}
+                  >
+                    Submit
+                  </ToggleButton>
+                </Box>
+              </Grid>
+            </Grid>
+            
           </Grid>
-
-          <Box display="flex" justifyContent="center" sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-              sx={{
-                padding: "10px 20px",
-                borderRadius: "8px",
-                fontWeight: "bold",
-              }}
-            >
-              {isEditing ? "Update Post" : "Create Post"}
-            </Button>
-          </Box>
         </Box>
       </DialogContent>
     </Dialog>
@@ -325,3 +345,4 @@ const CreatePostDialog = ({
 };
 
 export default CreatePostDialog;
+

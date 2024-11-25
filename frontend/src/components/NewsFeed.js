@@ -17,34 +17,20 @@ const NewsFeed = () => {
   const [lostItems, setLostItems] = useState([]);
   const [postToEdit, setPostToEdit] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
 
   const fetchLostItems = async () => {
-    const token = localStorage.getItem("token"); // Retrieve the token from localStorage
-    if (!token) {
-      alert("You must log in to view lost items.");
-      return;
-    }
-
     try {
-      const response = await axios.get("http://localhost:8080/api/lostandfound", {
-        headers: {
-          Authorization: `Bearer ${token}`, // Attach the JWT token
-        },
-      });
-      setLostItems(response.data); // Update the state with fetched items
+      const response = await axios.get("http://localhost:8080/api/lostandfound");
+      setLostItems(response.data);
     } catch (error) {
       console.error("Error fetching lost items:", error);
-      if (error.response?.status === 403) {
-        alert("Access denied. Please check your permissions.");
-      } else {
-        alert("Failed to fetch lost items. Try again later.");
-      }
     }
   };
 
+
   useEffect(() => {
-    fetchLostItems(); // Fetch items on component mount
+    fetchLostItems();
   }, []);
 
   const handleTextFieldClick = () => {
@@ -61,20 +47,18 @@ const NewsFeed = () => {
   };
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+    setSearchQuery(event.target.value); // Update the search query state
   };
 
-  // Filter items based on search query
   const filteredItems = lostItems.filter(
     (item) =>
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.reportType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.petCategory.toLowerCase().includes(searchQuery.toLowerCase())
+      item.reporttype.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.petcategory.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <>
-      {/* Search Box */}
       <Box
         sx={{
           position: "absolute",
@@ -95,6 +79,7 @@ const NewsFeed = () => {
           sx={{
             width: "100%",
             backgroundColor: "transparent",
+
             "& .MuiOutlinedInput-root": {
               height: "35px",
               border: "1px solid white",
@@ -118,6 +103,7 @@ const NewsFeed = () => {
               <Button
                 sx={{ padding: 0, backgroundColor: "transparent !important" }}
               >
+                {" "}
                 <SearchIcon />
               </Button>
             ),
@@ -144,7 +130,6 @@ const NewsFeed = () => {
           </Typography>
         </Grid>
 
-        {/* Create Post */}
         <Grid
           container
           justifyContent="center"
@@ -182,7 +167,6 @@ const NewsFeed = () => {
           />
         </Grid>
 
-        {/* Post Dialog */}
         <CreatePostDialog
           open={openDialog}
           setOpen={setOpenDialog}
@@ -193,12 +177,11 @@ const NewsFeed = () => {
           setPostToEdit={setPostToEdit}
         />
 
-        {/* Display Lost Items */}
         <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
           {filteredItems.map((item) => (
             <Grid
               item
-              key={item.id}
+              key={item.reportid}
               xs={12}
               sm={4}
               md={4}
