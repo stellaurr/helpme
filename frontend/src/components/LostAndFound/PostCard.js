@@ -103,9 +103,17 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
           {item.datereported}
         </Typography>
         <br />
-        <Typography color="primary" fontStyle="italic" noWrap>
+        <Typography
+          color="primary"
+          fontStyle="italic"
+          sx={{
+            whiteSpace: "normal",
+            overflowWrap: "break-word",
+          }}
+        >
           {item.description}
         </Typography>
+
       </CardContent>
 
       <div

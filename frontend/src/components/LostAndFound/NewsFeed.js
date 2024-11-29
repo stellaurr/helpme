@@ -61,11 +61,11 @@ const NewsFeed = () => {
     <>
       <Box
         sx={{
-          position: "absolute",
+          position: "fixed",
           top: "90px",
           left: "70%",
           transform: "translateX(-50%)",
-          zIndex: 10,
+          zIndex: 1301,
           width: "80%",
           maxWidth: "400px",
           padding: "5px",

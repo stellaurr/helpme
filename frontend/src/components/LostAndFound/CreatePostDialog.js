@@ -44,7 +44,6 @@ const CreatePostDialog = ({
       imagedata: postToEdit.imagefile || null,
     });
 
-    // Set preview image if editing and image exists
     if (postToEdit.imagefile) {
       const previewUrl = URL.createObjectURL(postToEdit.imagefile);
       setPreviewImage(previewUrl);
@@ -58,7 +57,7 @@ const CreatePostDialog = ({
       description: "",
       imagedata: null,
     });
-    setPreviewImage(null); // Clear the preview for a new post
+    setPreviewImage(null);
   }
 }, [isEditing, postToEdit, open]);
 

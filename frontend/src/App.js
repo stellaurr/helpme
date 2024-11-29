@@ -47,6 +47,11 @@ function App() {
     <UserProvider>
       <ThemeProvider theme={theme}>
         <Router>
+          <div
+            style={{
+              paddingTop: "120px", // Adjust based on your Navbar height
+            }}
+          ></div>
           <Navbar />
           <Routes>
             <Route path="/signup" element={<Signup />} />
