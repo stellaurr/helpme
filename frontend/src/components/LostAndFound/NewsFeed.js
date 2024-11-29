@@ -65,7 +65,7 @@ const NewsFeed = () => {
           top: "90px",
           left: "70%",
           transform: "translateX(-50%)",
-          zIndex: 1301,
+          zIndex: 1300,
           width: "80%",
           maxWidth: "400px",
           padding: "5px",

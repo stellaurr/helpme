@@ -29,10 +29,6 @@ public class LostAndFoundEntity {
     @Column(name = "description")
     private String description;
 
-    @Lob
-    @Column(name = "imagedata", columnDefinition = "LONGBLOB")
-    private byte[] imagedata;
-
     private String imageUrl;
 
     // Default constructor
@@ -41,13 +37,12 @@ public class LostAndFoundEntity {
 
     // Constructor with fields
     public LostAndFoundEntity(String reporttype, String petcategory, Date datereported, String lastseen,
-            String description, byte[] imagedata) {
+            String description) {
         this.reporttype = reporttype;
         this.petcategory = petcategory;
         this.datereported = datereported;
         this.lastseen = lastseen;
         this.description = description;
-        this.imagedata = imagedata;
     }
 
     // Getters and setters
