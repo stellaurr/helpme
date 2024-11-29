@@ -50,7 +50,6 @@ function App() {
           <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/adopt" element={<PetList />} />
           
-          <Route path="/adopt_dash" element={<AdoptionList />} />
           <Route path="/donate" element={<DonationForm />} />
           <Route path="/donation_dash" element={<DonationTable />} />
           <Route path="/volunteer" element={<Volunteer />} />
@@ -62,6 +61,7 @@ function App() {
             path="/admin/manage-volunteers"
             element={<VolunteerSignUp />}
           />
+          <Route path="/admin/adoption-list" element={<AdoptionList />} />
           <Route path="/opportunity/:id" element={<OpportunityDetail />} />
           <Route path="/book" element={<CreateOpportunity />} />
           <Route path="/admin" element={<AdminDashboard/>} />

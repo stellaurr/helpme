@@ -13,73 +13,95 @@ import {
   DialogContent,
   IconButton,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import AdoptionForm from './AdoptionForm'; 
 import RehomeForm from './RehomeForm';
 import goldenImage from '../assets/golden_retriever.jpg';
-import siameseImager from '../assets/siamese.jpg';
+import siameseImage from '../assets/siamese.jpg';
 import cockatielImage from '../assets/cockatiel.jpg';
 
-
 const PetList = () => {
-  const [openAdoption, setOpenAdoption] = useState(false); 
-  const [openRehome, setOpenRehome] = useState(false); 
+  const [openAdoption, setOpenAdoption] = useState(false);
+  const [openRehome, setOpenRehome] = useState(false); // Add this line
+  const [selectedPet, setSelectedPet] = useState(null);
+  const navigate = useNavigate();
 
-  const [pets] = useState([
+  const pets = [
     {
+      petId: 'P001', // Added Pet ID
       image: goldenImage,
       breed: 'Golden Retriever',
       type: 'Dog',
+      name: 'Buddy',
+      age: 3,
+      gender: 'Male',
       description: 'A friendly and intelligent breed.',
     },
     {
-      image: siameseImager,
+      petId: 'P002', // Added Pet ID
+      image: siameseImage,
       breed: 'Siamese',
       type: 'Cat',
+      name: 'Luna',
+      age: 2,
+      gender: 'Female',
       description: 'An affectionate and playful breed.',
     },
     {
+      petId: 'P003', // Added Pet ID
       image: cockatielImage,
       breed: 'Cockatiel',
       type: 'Bird',
+      name: 'Sunny',
+      age: 1,
+      gender: 'Male',
       description: 'A social and curious companion.',
     },
-    // Add more pet objects as needed
-  ]);
+  ];
 
-  const handleCardClick = () => {
-    // Opens the modal with the adoption form
+  const handleCardClick = (pet) => {
+    setSelectedPet(pet);
     setOpenAdoption(true);
   };
 
   const handleAdoptionClose = () => {
-    // Closes the adoption modal
     setOpenAdoption(false);
+    setSelectedPet(null);
   };
 
   const handleRehomeClick = () => {
-    // Opens the modal with the rehome form
     setOpenRehome(true);
   };
 
   const handleRehomeClose = () => {
-    // Closes the rehome modal
     setOpenRehome(false);
+  };
+
+  const handleListOpen = () => {
+    navigate('/admin/adoption-list');
   };
 
   return (
     <>
       <div style={styles.pageContainer}>
-        <Typography variant="h6" component="h6" sx={{ mb: 3, color: '#5A20A8', fontWeight: 'bold' }}>
-          List of Pets to Adopt
-        </Typography>
+      <Typography variant="h6" component="h6" sx={{ color: '#5A20A8', fontWeight: 'bold', padding: '20px' }}>
+  List of Pets to Adopt
+</Typography>
+
         <div style={styles.listContainer}>
           {pets.length > 0 ? (
             pets.map((pet, index) => (
               <Card
                 key={index}
-                sx={{ height: 400, display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
-                onClick={handleCardClick} // Opens the adoption modal when card is clicked
+                sx={{
+                  width: 360,
+                  height: 590, // Increased height to accommodate all content
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                }}
+                onClick={() => handleCardClick(pet)}
               >
                 {pet.image ? (
                   <CardMedia
@@ -129,6 +151,18 @@ const PetList = () => {
                     />
                   </Stack>
                   <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
+                    Pet ID
+                  </Typography>
+                  <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
+                    {pet.petId} {/* Display Pet ID */}
+                  </Typography>
+                  <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
+                    Name
+                  </Typography>
+                  <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
+                    {pet.name} {/* Display pet name */}
+                  </Typography>
+                  <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
                     Pet Type
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
@@ -139,6 +173,18 @@ const PetList = () => {
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
                     {pet.breed}
+                  </Typography>
+                  <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
+                    Age
+                  </Typography>
+                  <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
+                    {pet.age} years {/* Display pet age */}
+                  </Typography>
+                  <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
+                    Gender
+                  </Typography>
+                  <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
+                    {pet.gender} {/* Display pet gender */}
                   </Typography>
                   <br />
                   <Typography color="#5A20A8" fontStyle="italic" fontWeight="bold" noWrap>
@@ -155,7 +201,6 @@ const PetList = () => {
         </div>
       </div>
 
-      {/* Modal for Adoption Form */}
       <Dialog open={openAdoption} onClose={handleAdoptionClose} fullWidth maxWidth="md">
         <DialogTitle>
           <IconButton
@@ -172,11 +217,10 @@ const PetList = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <AdoptionForm /> {/* Render your AdoptionForm here */}
+          <AdoptionForm pet={selectedPet} />
         </DialogContent>
       </Dialog>
 
-      {/* Modal for Rehome Form */}
       <Dialog open={openRehome} onClose={handleRehomeClose} fullWidth maxWidth="md">
         <DialogTitle>
           <IconButton
@@ -193,15 +237,14 @@ const PetList = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <RehomeForm /> {/* Render your RehomeForm here */}
+          <RehomeForm />
         </DialogContent>
       </Dialog>
 
-      {/* Full-width Footer */}
       <Box
         sx={{
           width: '100vw',
-          backgroundColor: '#6c5ce7', // Footer color
+          backgroundColor: '#6c5ce7',
           color: 'white',
           textAlign: 'center',
           padding: '8px 0',
@@ -217,21 +260,38 @@ const PetList = () => {
           Do you want to rehome your pet?
         </Typography>
         <ToggleButton
-          onClick={handleRehomeClick} // Opens the rehome modal when clicked
+          onClick={handleRehomeClick}
           sx={{
-            border: "2px solid",
-            borderRadius: "25px",
-            padding: "12px 36px",
-            borderColor: "#6c5ce7",
-            backgroundColor: "#6c5ce7",
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "white",
-              color: "#6c5ce7",
+            border: '2px solid',
+            borderRadius: '25px',
+            padding: '12px 36px',
+            borderColor: '#6c5ce7',
+            backgroundColor: '#6c5ce7',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'white',
+              color: '#6c5ce7',
             },
           }}
         >
           Rehome
+        </ToggleButton>
+        <ToggleButton
+          onClick={handleListOpen}
+          sx={{
+            border: '2px solid',
+            borderRadius: '25px',
+            padding: '12px 36px',
+            borderColor: '#6c5ce7',
+            backgroundColor: '#6c5ce7',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: 'white',
+              color: '#6c5ce7',
+            },
+          }}
+        >
+          Admin
         </ToggleButton>
       </Box>
     </>
@@ -240,18 +300,16 @@ const PetList = () => {
 
 const styles = {
   pageContainer: {
-    display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-start', // Aligns the title and list to the left
-    width: '100%', // Ensures the container takes full width
-    padding: '20px',
+    alignItems: 'flex-start',
+    minHeight: '100vh',
   },
   listContainer: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '20px',
-    justifyContent: 'flex-start', // Aligns the cards to the left
-    width: '100%', // Ensures the list takes full width
+    justifyContent: 'flex-start',
+    padding: '10px',
   },
 };
 
