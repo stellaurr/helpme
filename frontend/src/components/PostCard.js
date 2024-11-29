@@ -1,8 +1,9 @@
 import React from "react";
 import {
-  Card,
   Box,
+  Card,
   CardContent,
+  CardMedia,
   Typography,
   IconButton,
   Stack,
@@ -52,38 +53,19 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
       : null;
 
   return (
-    <Card sx={{ height: 400, display: "flex", flexDirection: "column" }}>
-      {imageSrc ? (
-        <Box
-          component="img"
-          src={imageSrc}
-          alt="Post Image"
-          sx={{
-            height: 140,
-            width: "100%",
-            objectFit: "cover",
-            borderTopLeftRadius: "4px",
-            borderTopRightRadius: "4px",
-          }}
-        />
-      ) : (
-        <Box
-          sx={{
-            height: 140,
-            width: "100%",
-            backgroundColor: "#f0f0f0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderTopLeftRadius: "4px",
-            borderTopRightRadius: "4px",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            No Image Available
-          </Typography>
-        </Box>
-      )}
+    <Card sx={{ height: 500, display: "flex", flexDirection: "column" }}>
+      <CardMedia
+        component="img"
+        alt={item.description}
+        height="200"
+        image={
+          item.imageUrl
+            ? `http://localhost:8080${item.imageUrl}`
+            : "http://localhost:8080/images/default_image.jpg"
+        }
+        title={item.description}
+      />
+
 
       <CardContent sx={{ flexGrow: 1, overflow: "hidden" }}>
         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>

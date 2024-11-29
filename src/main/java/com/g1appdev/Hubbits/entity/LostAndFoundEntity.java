@@ -33,6 +33,8 @@ public class LostAndFoundEntity {
     @Column(name = "imagedata", columnDefinition = "LONGBLOB")
     private byte[] imagedata;
 
+    private String imageUrl;
+
     // Default constructor
     public LostAndFoundEntity() {
     }
@@ -97,19 +99,11 @@ public class LostAndFoundEntity {
         this.description = description;
     }
 
-    public byte[] getImagedata() {
-        return imagedata;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImagedata(byte[] imagedata) {
-        this.imagedata = imagedata;
-    }
-
-    // Method to get Base64 representation of the image
-    public String getImagedataBase64() {
-        if (imagedata != null && imagedata.length > 0) {
-            return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(imagedata);
-        }
-        return null;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

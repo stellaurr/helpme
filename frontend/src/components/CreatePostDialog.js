@@ -68,7 +68,7 @@ const CreatePostDialog = ({
   const handleImageUpload = (e) => {
   const file = e.target.files[0];
   if (file && file.type.startsWith("image/")) {
-    setFormData({ ...formData, imagedata: file }); // Maintain consistent naming
+    setFormData({ ...formData, imagedata: file });
     const previewUrl = URL.createObjectURL(file);
     setPreviewImage(previewUrl);
   } else {
@@ -97,10 +97,9 @@ const CreatePostDialog = ({
       dataToSubmit.append("imagefile", formData.imagedata);
     }
 
-
     try {
       const url = isEditing
-         ? `http://localhost:8080/api/lostandfound/${postToEdit.reportid}`
+        ? `http://localhost:8080/api/lostandfound/${postToEdit.reportid}`
         : `http://localhost:8080/api/lostandfound`;
 
       const method = isEditing ? "put" : "post";
@@ -111,13 +110,17 @@ const CreatePostDialog = ({
       });
 
       console.log(isEditing ? "Report updated" : "Report created", response.data);
-      fetchLostItems();
+      
+      // Refresh the page after submission
+      window.location.reload();
+
       setOpen(false);
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to submit the post.");
     }
   };
+
 
   return (
     <Dialog
