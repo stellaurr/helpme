@@ -12,6 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import InputAdornment from "@mui/material/InputAdornment";
+
 import axios from "axios";
 
 const CreatePostDialog = ({
@@ -265,6 +267,13 @@ const CreatePostDialog = ({
                 onChange={handleInputChange}
                 InputLabelProps={{
                   shrink: true,
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end" style={{ color: "#675BC8" }}>
+                      {/* Calendar icon styling */}
+                    </InputAdornment>
+                  ),
                 }}
               />
             </Grid>

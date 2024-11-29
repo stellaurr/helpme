@@ -28,48 +28,55 @@ const theme = createTheme({
     primary: {
       main: "#675BC8",
     },
+    mode: "light", 
+  },
+  components: {
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: "#675BC8",
+        },
+      },
+    },
   },
 });
 
 
-
 function App() {
   return (
-      <UserProvider>
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/users" element={<UserDashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/" element={<Home />} /> {/* Default to login */}
-          <Route path="/home" element={<Home />} />
-          <Route path="/lost-and-found" element={<LostAndFound />} />
-          <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/adopt" element={<PetList />} />
-          
-          <Route path="/donate" element={<DonationForm />} />
-          <Route path="/donation_dash" element={<DonationTable />} />
-          <Route path="/volunteer" element={<Volunteer />} />
-          <Route
-            path="/admin/manage-opportunities"
-            element={<VolunteerOpportunities />}
-          />
-          <Route
-            path="/admin/manage-volunteers"
-            element={<VolunteerSignUp />}
-          />
-          <Route path="/admin/adoption-list" element={<AdoptionList />} />
-          <Route path="/opportunity/:id" element={<OpportunityDetail />} />
-          <Route path="/book" element={<CreateOpportunity />} />
-          <Route path="/admin" element={<AdminDashboard/>} />
-          
-        </Routes>
-      </Router>
-    </ThemeProvider>
-</UserProvider>
+    <UserProvider>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Navbar />
+          <Routes>
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/users" element={<UserDashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/" element={<Home />} /> {/* Default to login */}
+            <Route path="/home" element={<Home />} />
+            <Route path="/lost-and-found" element={<LostAndFound />} />
+            <Route path="/sponsor" element={<Sponsor />} />
+            <Route path="/adopt" element={<PetList />} />
+            <Route path="/donate" element={<DonationForm />} />
+            <Route path="/donation_dash" element={<DonationTable />} />
+            <Route path="/volunteer" element={<Volunteer />} />
+            <Route
+              path="/admin/manage-opportunities"
+              element={<VolunteerOpportunities />}
+            />
+            <Route
+              path="/admin/manage-volunteers"
+              element={<VolunteerSignUp />}
+            />
+            <Route path="/admin/adoption-list" element={<AdoptionList />} />
+            <Route path="/opportunity/:id" element={<OpportunityDetail />} />
+            <Route path="/book" element={<CreateOpportunity />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </UserProvider>
   );
 }
 
