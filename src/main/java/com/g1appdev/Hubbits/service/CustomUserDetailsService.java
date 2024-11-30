@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -21,6 +23,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -35,7 +39,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 userEntity.getUsername(),
                 userEntity.getPassword(),
-                new ArrayList<>());
+                new ArrayList<>()
+        );
     }
+
+
+
 
 }

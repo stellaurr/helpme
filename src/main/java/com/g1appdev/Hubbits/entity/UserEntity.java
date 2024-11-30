@@ -8,9 +8,10 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import jakarta.validation.constraints.Size;
 
+
 @Entity
-// @AllArgsConstructor
-// @NoArgsConstructor
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Table(name = "users")
 public class UserEntity {
 
@@ -128,12 +129,15 @@ public class UserEntity {
         return profilePicture;
     }
 
+
+
     public String getProfilePictureBase64() {
         if (profilePicture != null && profilePicture.length > 0) {
             return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(profilePicture);
         }
         return null;
     }
+
 
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;

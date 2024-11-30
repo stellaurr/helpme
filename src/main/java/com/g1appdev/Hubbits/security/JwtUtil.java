@@ -40,13 +40,13 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    // private Claims extractAllClaims(String token) {
-    // return Jwts.parserBuilder()
-    // .setSigningKey(SECRET_KEY)
-    // .build()
-    // .parseClaimsJws(token)
-    // .getBody();
-    // }
+//    private Claims extractAllClaims(String token) {
+//        return Jwts.parserBuilder()
+//                .setSigningKey(SECRET_KEY)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//    }
 
     private Claims extractAllClaims(String token) {
         try {
@@ -60,6 +60,7 @@ public class JwtUtil {
             throw e;
         }
     }
+
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -75,7 +76,7 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours validity
+        long EXPIRATION_TIME = 1000 * 60 * 60 * 10;  // 10 hours validity
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -94,13 +95,13 @@ public class JwtUtil {
 
     public List<GrantedAuthority> getAuthoritiesFromToken(String token) {
         Claims claims = extractAllClaims(token);
-        List<String> roles = claims.get("roles", List.class); // Retrieve roles with the "roles" key
+        List<String> roles = claims.get("roles", List.class);  // Retrieve roles with the "roles" key
 
         logger.info("Extracted roles from token: {}", roles);
 
         // Convert roles to Spring Security format
         return roles.stream()
-                .map(SimpleGrantedAuthority::new) // Avoid double prefixing with "ROLE_"
+                .map(SimpleGrantedAuthority::new)  // Avoid double prefixing with "ROLE_"
                 .collect(Collectors.toList());
     }
 }

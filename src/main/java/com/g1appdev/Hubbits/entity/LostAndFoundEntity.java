@@ -1,92 +1,86 @@
 package com.g1appdev.Hubbits.entity;
 
-import java.util.Base64;
 import java.util.Date;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "lostandfound")
 public class LostAndFoundEntity {
-
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reportid")
-    private int reportid;
-
-    @Column(name = "reporttype", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'lost'")
-    private String reporttype = "lost";
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrementing primary key
+    private int reportID;
+    
+    @Column(name = "reporttype") // Column name in the database
+    private String reportType;
 
     @Column(name = "petcategory")
-    private String petcategory;
-
-    @Temporal(TemporalType.DATE)
-    @Column(name = "datereported")
-    private Date datereported;
-
-    @Column(name = "lastseen")
-    private String lastseen;
-
-    @Column(name = "description")
-    private String description;
-
-    private String imageurl;
-
-    @Column(nullable = false)
-    private int creatorid;
+    private String petCategory;
+    
+    @Column(name = "datereported") // Column name in the database
+    @Temporal(TemporalType.DATE) // Specifies the date type
+    private Date dateReported;
+    
+    @Column(name = "lastseen") // Column name in the database
+    private String lastSeen;
+    
+    private String description; // Description of the lost and found item
+    
+    @Lob // Indicates that this is a large object
+    @Column(name = "imagedata") // Column name in the database
+    private byte[] image; // Store image data as byte array
 
     // Default constructor
-    public LostAndFoundEntity() {
-    }
+    public LostAndFoundEntity() {}
 
-    // Constructor with fields
-    public LostAndFoundEntity(String reporttype, String petcategory, Date datereported, String lastseen,
-            String description) {
-        this.reporttype = reporttype;
-        this.petcategory = petcategory;
-        this.datereported = datereported;
-        this.lastseen = lastseen;
+    // Constructor with all parameters except reportID
+    public LostAndFoundEntity(String reportType, Date dateReported, String lastSeen, String description, byte[] image) {
+        this.reportType = reportType;
+        this.dateReported = dateReported;
+        this.lastSeen = lastSeen;
         this.description = description;
+        this.image = image; // Initialize the image field
     }
 
-    // Getters and setters
-    public int getReportid() {
-        return reportid;
+    // Getters and Setters
+    public int getReportID() {
+        return reportID;
     }
 
-    public void setReportid(int reportid) {
-        this.reportid = reportid;
+    public void setReportID(int reportID) {
+        this.reportID = reportID;
     }
 
-    public String getReporttype() {
-        return reporttype;
+    public String getReportType() {
+        return reportType;
     }
 
-    public void setReporttype(String reporttype) {
-        this.reporttype = reporttype;
+    public void setPetCategory(String petCategory) {
+        this.petCategory = petCategory;
     }
 
-    public String getPetcategory() {
-        return petcategory;
+    public String getPetCategory() {
+        return petCategory;
     }
 
-    public void setPetcategory(String petcategory) {
-        this.petcategory = petcategory;
+    public void setReportType(String reportType) {
+        this.reportType = reportType;
     }
 
-    public Date getDatereported() {
-        return datereported;
+    public Date getDateReported() {
+        return dateReported;
     }
 
-    public void setDatereported(Date datereported) {
-        this.datereported = datereported;
+    public void setDateReported(Date dateReported) {
+        this.dateReported = dateReported;
     }
 
-    public String getLastseen() {
-        return lastseen;
+    public String getLastSeen() {
+        return lastSeen;
     }
 
-    public void setLastseen(String lastseen) {
-        this.lastseen = lastseen;
+    public void setLastSeen(String lastSeen) {
+        this.lastSeen = lastSeen;
     }
 
     public String getDescription() {
@@ -97,19 +91,11 @@ public class LostAndFoundEntity {
         this.description = description;
     }
 
-    public String getImageurl() {
-        return imageurl;
+    public byte[] getImage() {
+        return image;
     }
 
-    public void setImageurl(String imageurl) {
-        this.imageurl = imageurl;
-    }
-
-    public int getCreatorid() {
-        return creatorid;
-    }
-
-    public void setCreatorid(int creatorid) {
-        this.creatorid = creatorid;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

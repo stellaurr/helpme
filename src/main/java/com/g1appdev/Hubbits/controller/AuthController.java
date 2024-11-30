@@ -45,8 +45,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<String> signupUser(@RequestBody UserEntity newUser) {
         // Log the incoming request for debugging purposes
-        logger.info(
-                "Signup request received: FirstName={}, LastName={}, Username={}, Email={}, Address={}, PhoneNumber={}",
+        logger.info("Signup request received: FirstName={}, LastName={}, Username={}, Email={}, Address={}, PhoneNumber={}",
                 newUser.getFirstName(), newUser.getLastName(), newUser.getUsername(), newUser.getEmail(),
                 newUser.getAddress(), newUser.getPhoneNumber());
 
@@ -54,10 +53,13 @@ public class AuthController {
 
             newUser.setRole("ROLE_USER");
 
+
             userService.createUser(newUser);
+
 
             logger.info("User successfully saved: Username={}", newUser.getUsername());
             return ResponseEntity.ok("User saved successfully");
+
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -73,10 +75,13 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@RequestBody UserEntity loginRequest) {
         logger.info("Login attempt with username: {}", loginRequest.getUsername());
 
+
         Optional<UserEntity> userEntity = userService.findByUsername(loginRequest.getUsername());
+
 
         logger.info("Incoming password: {}", loginRequest.getPassword());
         logger.info("Stored password (hashed): {}", userEntity.get().getPassword());
+
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.get().getPassword())) {
             logger.error("Passwords do NOT match!");
@@ -85,9 +90,11 @@ public class AuthController {
 
         logger.info("Passwords match!");
 
+
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
             SecurityContextHolder.getContext().setAuthentication(auth);
             logger.info("User {} authenticated successfully", loginRequest.getUsername());
         } catch (AuthenticationException e) {
@@ -95,14 +102,15 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        List<String> roles = List.of(userEntity.get().getRole().startsWith("ROLE_") ? userEntity.get().getRole()
-                : "ROLE_" + userEntity.get().getRole());
+
+        List<String> roles = List.of(userEntity.get().getRole().startsWith("ROLE_") ? userEntity.get().getRole() : "ROLE_" + userEntity.get().getRole());
 
         logger.info("Roles for token generation: {}", roles);
 
         String token = jwtTokenUtil.generateToken(loginRequest.getUsername(), roles);
         return ResponseEntity.ok(token);
     }
+
 
     @GetMapping("/login")
     public String loginPage() {
