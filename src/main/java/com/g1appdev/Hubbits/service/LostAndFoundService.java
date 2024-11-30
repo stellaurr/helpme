@@ -1,12 +1,16 @@
 package com.g1appdev.Hubbits.service;
 
 import com.g1appdev.Hubbits.entity.LostAndFoundEntity;
+import com.g1appdev.Hubbits.entity.UserEntity;
 import com.g1appdev.Hubbits.repository.LostAndFoundRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +24,9 @@ public class LostAndFoundService {
 
     @Autowired
     private LostAndFoundRepository repository;
+
+    @Autowired
+    private UserService userService;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/lostfound-images";
 
@@ -39,10 +46,26 @@ public class LostAndFoundService {
 
     // Create a new report
     public LostAndFoundEntity createReport(LostAndFoundEntity report, MultipartFile imageFile) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        Optional<UserEntity> currentUser = userService.findByUsername(username);
+
+        if (currentUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        // Set the creatorId
+        report.setCreatorid(Math.toIntExact(currentUser.get().getUserId()));
+
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                String imageUrl = uploadImage(imageFile);
-                report.setImageUrl(imageUrl);
+                String imageurl = uploadImage(imageFile);
+                report.setImageurl(imageurl);
             } catch (IOException e) {
                 throw new RuntimeException("Error saving image file", e);
             }
@@ -63,7 +86,26 @@ public class LostAndFoundService {
     // Update an existing report
     @Transactional
     public LostAndFoundEntity updateReport(int id, LostAndFoundEntity updatedReport, MultipartFile imageFile) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+            throw new IllegalArgumentException("User is not authenticated.");
+        }
+
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        Optional<UserEntity> currentUser = userService.findByUsername(username);
+
+        if (currentUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        int currentUserId = Math.toIntExact(currentUser.get().getUserId());
+
         return repository.findById(id).map(existingReport -> {
+            if (existingReport.getCreatorid() != currentUserId) {
+                throw new IllegalArgumentException("You are not authorized to update this report.");
+            }
+
+            // Update report fields
             existingReport.setReporttype(updatedReport.getReporttype());
             existingReport.setPetcategory(updatedReport.getPetcategory());
             existingReport.setDatereported(updatedReport.getDatereported());
@@ -72,8 +114,8 @@ public class LostAndFoundService {
 
             if (imageFile != null && !imageFile.isEmpty()) {
                 try {
-                    String imageUrl = uploadImage(imageFile);
-                    existingReport.setImageUrl(imageUrl);
+                    String imageurl = uploadImage(imageFile);
+                    existingReport.setImageurl(imageurl);
                 } catch (IOException e) {
                     throw new RuntimeException("Error updating image file", e);
                 }
@@ -83,11 +125,35 @@ public class LostAndFoundService {
         }).orElseThrow(() -> new IllegalArgumentException("Report with ID " + id + " not found"));
     }
 
-    // Delete a report by ID
+    @Transactional
     public void deleteReport(int id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Report with ID " + id + " not found");
+        // Authenticate the user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
+            throw new IllegalArgumentException("User is not authenticated.");
         }
-        repository.deleteById(id);
+
+        // Get the username from the SecurityContext
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        Optional<UserEntity> currentUser = userService.findByUsername(username);
+
+        if (currentUser.isEmpty()) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        int currentUserId = Math.toIntExact(currentUser.get().getUserId());
+
+        // Retrieve the report
+        LostAndFoundEntity report = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Report with ID " + id + " not found."));
+
+        // Check authorization
+        if (report.getCreatorid() != currentUserId) {
+            throw new IllegalArgumentException("You are not authorized to delete this report.");
+        }
+
+        // Perform deletion
+        repository.delete(report);
+        System.out.println("Report with ID " + id + " deleted successfully by user with ID " + currentUserId);
     }
 }

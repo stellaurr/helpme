@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState} from "react";
 import {
   Box,
   Card,
@@ -14,35 +15,33 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
 const PostCard = ({ item, fetchLostItems, onEdit }) => {
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete the post?"
-    );
-    if (!confirmed) return;
+  const [isDeleting, setIsDeleting] = useState(false);
 
-    try {
-      if (item?.reportid) {
-        await axios.delete(
-          `http://localhost:8080/api/lostandfound/${item.reportid}`
-        );
-        alert("Item deleted successfully");
-        fetchLostItems();
-      } else {
-        alert("Item ID is not defined");
+  const handleDelete = async () => {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+          alert("You are not authenticated. Please log in first.");
+          return;
       }
-    } catch (error) {
-      alert(
-        "Failed to delete item: " +
-          (error.response?.data?.message || error.message)
-      );
-    }
+
+      try {
+          await axios.delete(`http://localhost:8080/api/lostandfound/${item.reportid}`, {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          });
+
+          alert("Item deleted successfully");
+          fetchLostItems();
+      } catch (error) {
+          console.error("Error during DELETE:", error);
+          alert("Failed to delete item: " + (error.response?.data?.message || error.message));
+      }
   };
 
   const handleEdit = () => {
     onEdit(item);
   };
-
-  // Handle imageSrc based on byte array or base64 string
   const imageSrc =
     item.image && typeof item.image === "string"
       ? `data:image/png;base64,${item.image}`
@@ -59,8 +58,8 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
         alt={item.description}
         height="200"
         image={
-          item.imageUrl
-            ? `http://localhost:8080${item.imageUrl}`
+          item.imageurl
+            ? `http://localhost:8080${item.imageurl}`
             : "http://localhost:8080/images/default_image.jpg"
         }
         title={item.description}
@@ -126,9 +125,14 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
         <IconButton color="primary" onClick={handleEdit}>
           <EditIcon />
         </IconButton>
-        <IconButton color="primary" onClick={handleDelete}>
+        <IconButton
+          color="primary"
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
           <DeleteIcon />
         </IconButton>
+
       </div>
     </Card>
   );

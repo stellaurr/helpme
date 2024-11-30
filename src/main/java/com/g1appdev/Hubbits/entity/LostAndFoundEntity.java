@@ -29,7 +29,10 @@ public class LostAndFoundEntity {
     @Column(name = "description")
     private String description;
 
-    private String imageUrl;
+    private String imageurl;
+
+    @Column(nullable = false)
+    private int creatorid;
 
     // Default constructor
     public LostAndFoundEntity() {
@@ -94,11 +97,19 @@ public class LostAndFoundEntity {
         this.description = description;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageurl() {
+        return imageurl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageurl(String imageurl) {
+        this.imageurl = imageurl;
+    }
+
+    public int getCreatorid() {
+        return creatorid;
+    }
+
+    public void setCreatorid(int creatorid) {
+        this.creatorid = creatorid;
     }
 }

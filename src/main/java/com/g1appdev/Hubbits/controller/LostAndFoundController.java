@@ -30,6 +30,7 @@ public class LostAndFoundController {
             @RequestParam("datereported") String datereported,
             @RequestParam("lastseen") String lastseen,
             @RequestParam("description") String description,
+            @RequestParam("creatorid") int creatorid,
             @RequestParam(value = "imagefile", required = false) MultipartFile imageFile) {
 
         Date date;
@@ -45,6 +46,17 @@ public class LostAndFoundController {
         report.setDatereported(date);
         report.setLastseen(lastseen);
         report.setDescription(description);
+        report.setCreatorid(creatorid);
+
+        System.out.println("Report Type: " + reporttype);
+        System.out.println("Pet Category: " + petcategory);
+        System.out.println("Date Reported: " + datereported);
+        System.out.println("Last Seen: " + lastseen);
+        System.out.println("Description: " + description);
+        System.out.println("Creator ID: " + creatorid);
+        if (imageFile != null) {
+            System.out.println("Image File Name: " + imageFile.getOriginalFilename());
+        }
 
         service.createReport(report, imageFile);
         return ResponseEntity.ok("Report created successfully.");
@@ -97,4 +109,5 @@ public class LostAndFoundController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }
