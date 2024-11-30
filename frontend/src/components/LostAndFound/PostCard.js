@@ -1,5 +1,5 @@
 
-import React, { useState} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -9,6 +9,11 @@ import {
   IconButton,
   Stack,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,43 +21,75 @@ import axios from "axios";
 
 const PostCard = ({ item, fetchLostItems, onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [creatorUsername, setCreatorUsername] = useState("Unknown");
+  const [openDialog, setOpenDialog] = useState(false); 
+
+  useEffect(() => {
+    const fetchCreatorUsername = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/users/${item.creatorid}`);
+        if (response.status === 200) {
+          setCreatorUsername(response.data.username);
+        } else {
+          setCreatorUsername("Unknown");
+        }
+      } catch (error) {
+        console.error("Error fetching creator's details:", error);
+        setCreatorUsername("Unknown");
+      }
+    };
+
+    fetchCreatorUsername();
+  }, [item.creatorid]);
+
+  useEffect(() => {
+    // Retrieve user ID from local storage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser && storedUser.userId) {
+      setUserId(storedUser.userId);
+    } else {
+      console.error("User ID not found in local storage.");
+    }
+  }, []);
 
   const handleDelete = async () => {
-      const token = localStorage.getItem("jwtToken");
+      const token = localStorage.getItem("token");
       if (!token) {
-          alert("You are not authenticated. Please log in first.");
-          return;
+        alert("You are not authenticated. Please log in first.");
+        return;
       }
 
       try {
-          await axios.delete(`http://localhost:8080/api/lostandfound/${item.reportid}`, {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          });
+        await axios.delete(`http://localhost:8080/api/lostandfound/${item.reportid}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-          alert("Item deleted successfully");
-          fetchLostItems();
+        alert("Item deleted successfully");
+        fetchLostItems();
+        setOpenDialog(false); // Close the confirmation dialog after deletion
       } catch (error) {
-          console.error("Error during DELETE:", error);
-          alert("Failed to delete item: " + (error.response?.data?.message || error.message));
+        console.error("You are not authorized to delete this item");
+        setOpenDialog(false); // Close dialog even if there's an error
       }
-  };
+    };
 
-  const handleEdit = () => {
-    onEdit(item);
-  };
-  const imageSrc =
-    item.image && typeof item.image === "string"
-      ? `data:image/png;base64,${item.image}`
-      : item.image
-      ? `data:image/png;base64,${btoa(
-          String.fromCharCode(...new Uint8Array(item.image))
-        )}`
-      : null;
+    const handleOpenDialog = () => {
+      setOpenDialog(true); // Open the dialog when the delete button is clicked
+    };
+
+    const handleCloseDialog = () => {
+      setOpenDialog(false); // Close the dialog without deleting
+    };
+
+    const handleEdit = () => {
+      onEdit(item);
+    };
 
   return (
-    <Card sx={{ height: 500, display: "flex", flexDirection: "column" }}>
+    <Card sx={{ height: 520, display: "flex", flexDirection: "column" }}>
       <CardMedia
         component="img"
         alt={item.description}
@@ -112,28 +149,98 @@ const PostCard = ({ item, fetchLostItems, onEdit }) => {
         >
           {item.description}
         </Typography>
+        <br />
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography color="primary" fontSize="14px">
+            Posted by
+          </Typography>
+          <Typography color="secondary" fontWeight="bold" sx={{ whiteSpace: "nowrap" }}>
+            {creatorUsername}
+          </Typography>
+        </Stack>
 
       </CardContent>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "8px",
+      {parseInt(userId) === item.creatorid && (
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px" }}>
+          <IconButton color="primary" onClick={handleEdit}>
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="primary"
+            onClick={handleOpenDialog}
+            disabled={isDeleting}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          "& .MuiPaper-root": {
+            backgroundColor: "white",
+            border: "2px solid",
+            borderColor: "primary.main",
+            borderRadius: "16px",
+            boxShadow: "none",
+          },
+          "& .MuiDialog-container": {
+            backdropFilter: "blur(3px)",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+          },
         }}
       >
-        <IconButton color="primary" onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          color="primary"
-          onClick={handleDelete}
-          disabled={isDeleting}
+        <DialogTitle>
+          <Typography
+            variant="h4"
+            component="div"
+            color="error"
+            align="center"
+            
+            sx={{ fontWeight: "bold", fontFamily: "'Caramel', sans-serif" }}
+          >
+            Delete Post
+          </Typography>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            backgroundColor: "white",
+            borderTop: "1px solid",
+            borderColor: "primary.main",
+            borderRadius: "0 0 16px 16px",
+            display: "flex", // Added
+            flexDirection: "column", // Added
+            alignItems: "center", // Added
+            justifyContent: "center", // Added
+            padding: "24px",
+            textAlign: "center", // Added to center the text inside
+          }}
         >
-          <DeleteIcon />
-        </IconButton>
+          <br></br>
+          <Typography color="error" fontSize="18px" fontWeight="bold" sx={{ whiteSpace: "nowrap" }}>
+            Are you sure you want to delete this post?
+          </Typography>
+          <Typography color="error" fontSize="18px">
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
 
-      </div>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 };

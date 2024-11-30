@@ -283,9 +283,6 @@ const CreatePostDialog = ({
           </ToggleButtonGroup>
           {/* Form Fields */}
           <Grid container spacing={2}>
-             <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                Debug User ID: {userId ? userId : "No user ID found"}
-              </Typography>
             <Grid item xs={12}>
               <TextField
                 name="petcategory"
