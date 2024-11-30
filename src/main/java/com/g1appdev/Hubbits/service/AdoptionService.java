@@ -26,6 +26,7 @@ public class AdoptionService {
 
     // Create a new adoption
     public AdoptionEntity createAdoption(AdoptionEntity adoption) {
+        // Ensure all fields are properly set before saving
         return adoptionRepository.save(adoption);
     }
 
@@ -35,13 +36,18 @@ public class AdoptionService {
         Optional<AdoptionEntity> existingAdoptionOpt = adoptionRepository.findById(id);
         if (existingAdoptionOpt.isPresent()) {
             AdoptionEntity existingAdoption = existingAdoptionOpt.get();
+
+            // Update the fields
             existingAdoption.setAdoptionDate(adoption.getAdoptionDate());
             existingAdoption.setStatus(adoption.getStatus());
-            existingAdoption.setName(adoption.getName()); // Update name
-            existingAdoption.setAddress(adoption.getAddress()); // Update address
-            existingAdoption.setContactNumber(adoption.getContactNumber()); // Update contact number
-            existingAdoption.setPetType(adoption.getPetType()); // Update type of pet
-            existingAdoption.setSubmissionDate(adoption.getSubmissionDate()); // Update submission date
+            existingAdoption.setName(adoption.getName()); 
+            existingAdoption.setAddress(adoption.getAddress());
+            existingAdoption.setContactNumber(adoption.getContactNumber());
+            existingAdoption.setPetType(adoption.getPetType());
+            existingAdoption.setBreed(adoption.getBreed()); // Update breed
+            existingAdoption.setDescription(adoption.getDescription()); // Update description
+            existingAdoption.setSubmissionDate(adoption.getSubmissionDate());
+
             return adoptionRepository.save(existingAdoption);
         }
         return null; // Or throw an exception as per your error handling

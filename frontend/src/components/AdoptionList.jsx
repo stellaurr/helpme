@@ -33,6 +33,7 @@ const AdoptionList = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const navigate = useNavigate();
+    const [newStatus, setNewStatus] = useState('');
 
     // Fetch adoption and rehome records
     useEffect(() => {
@@ -54,76 +55,100 @@ const AdoptionList = () => {
         navigate('/adopt'); 
     };
 
-    const handleDeleteClick = (id) => {
-        setDeleteId(id);
-        setDeleteDialogOpen(true);
-    };
-
-    const handleDelete = async () => {
-        setDeleteDialogOpen(false);
-        if (!deleteId) return;
-
-        try {
-            await axios.delete(`http://localhost:8080/api/adoptions/${deleteId}`);
-            setAdoptions(prevAdoptions => prevAdoptions.filter(adoption => adoption.adoptionID !== deleteId));
-            setSuccessMessage("Adoption deleted successfully!");
-            setDeleteId(null);
-        } catch (error) {
-            setError("Failed to delete adoption.");
-        }
-    };
-
-    const handleEditAdoption = () => {
-        setConfirmDialogOpen(true);
-    };
-
-    const handleEditRehome = async () => {
-        setEditDialogOpen(false);
     
-        if (!editRehome) return;
-    
-        try {
-            const response = await axios.put(`http://localhost:8080/api/pet/updateRehomeStatus/${editRehome.pid}`, editRehome);
-
-            setRehomes((prevRehomes) =>
-                prevRehomes.map((rehome) =>
-                    rehome.pid === response.data.pid ? response.data : rehome
-                )
-            );
-    
-            setEditRehome(null); // Clear the selected record
-            setSuccessMessage("Rehome status updated successfully!");
-        } catch (error) {
-            setError("Failed to update rehome status.");
-        }
-    };
-    
-    
-    const handleConfirmUpdate = async () => {
-        setConfirmDialogOpen(false);
-        if (!editAdoption) return;
-
-        try {
-            const response = await axios.put(`http://localhost:8080/api/adoptions/${editAdoption.adoptionID}`, editAdoption);
-            setAdoptions(prevAdoptions => prevAdoptions.map(adoption => (adoption.adoptionID === response.data.adoptionID ? response.data : adoption)));
-            setEditDialogOpen(false);
-            setEditAdoption(null);
-            setSuccessMessage("Adoption updated successfully!");
-        } catch (error) {
-            setError("Failed to update adoption.");
-        }
-    };
-
     const handleEditClick = (adoption) => {
-        setEditAdoption(adoption);
-        setEditDialogOpen(true);
+        setEditAdoption(adoption); // Set the adoption being edited
+        setNewStatus(adoption.status); // Pre-fill the status dropdown
+        setEditDialogOpen(true); // Open the dialog
+    };
+
+    // Close the edit dialog
+    const handleDialogClose = () => {
+        setEditDialogOpen(false);
+        setEditAdoption(null);
+    };
+
+    // Handle status change
+    const handleStatusChange = (event) => {
+        setNewStatus(event.target.value);
+    };
+
+    // Save the updated status
+    const handleSaveStatus = async () => {
+        try {
+            if (editAdoption) {
+                const updatedAdoption = { ...editAdoption, status: newStatus };
+                await axios.put(`http://localhost:8080/api/adoptions/${editAdoption.adoptionID}`, updatedAdoption);
+    
+                // Update the local state with the new status
+                setAdoptions((prev) =>
+                    prev.map((adoption) =>
+                        adoption.adoptionID === editAdoption.adoptionID ? { ...adoption, status: newStatus } : adoption
+                    )
+                );
+    
+                setSuccessMessage('Adoption status updated successfully!');
+            }
+        } catch (error) {
+            setError('Failed to update adoption status.');
+        } finally {
+            handleDialogClose(); // Close the dialog after saving
+        }
     };
     
+
     const handleEditRehomeClick = (rehome) => {
-        setEditRehome(rehome);
-        setEditDialogOpen(true);
+        setEditRehome(rehome); // Set the rehome being edited
+        setNewStatus(rehome.status); // Pre-fill the status dropdown
+        setEditDialogOpen(true); // Open the dialog
     };
+
+    const handleSaveRehomeStatus = async () => {
+        try {
+            if (editRehome) {
+                console.log("Editing rehome: ", editRehome);
+                
+                const petToAdd = {
+                    name: editRehome.name,
+                    type: editRehome.type,
+                    breed: editRehome.breed,
+                    age: editRehome.age,
+                    gender: editRehome.gender,
+                    description: editRehome.description,
+                    photo: editRehome.photo,  // Assuming the photo is part of the rehome data
+                    status: "AVAILABLE",  // Set the status to "AVAILABLE" when adding to PetList
+                    userName: editRehome.userName,  // Assuming these fields are part of the rehome
+                    address: editRehome.address,
+                    contactNumber: editRehome.contactNumber,
+                    submissionDate: editRehome.submissionDate,
+                };
     
+                if (newStatus === "REJECTED") {
+                    console.log("Rehome rejected, deleting pet from rehome list");
+                    await axios.delete(`http://localhost:8080/api/pet/deletePetDetails/${editRehome.pid}`);
+                    setRehomes((prev) => prev.filter((rehome) => rehome.pid !== editRehome.pid));
+                    setSuccessMessage("Rehome record rejected and deleted.");
+                } else if (newStatus === "ACCEPTED_REHOME") {
+                    console.log("Rehome accepted, adding pet to PetList");
+                    const response = await axios.post("http://localhost:8080/api/pet/postpetrecord", petToAdd);
+                    console.log("Response from adding pet: ", response);
+    
+                    // Remove the approved rehome from the rehome list
+                    setRehomes((prev) => prev.filter((rehome) => rehome.pid !== editRehome.pid));
+    
+                    // Optionally update the PetList by refetching or adding the new pet locally
+                    fetchRecords();  // Fetch updated PetList after approval
+    
+                    setSuccessMessage("Rehome approved and pet added to PetList.");
+                }
+            }
+        } catch (error) {
+            console.error("Error updating rehome status: ", error);
+            setError("Failed to update rehome status.");
+        } finally {
+            handleDialogClose();  // Close the dialog after processing
+        }
+    };    
 
     const renderAdoptionCards = (adoptionList) => (
         adoptionList.map((adoption) => (
@@ -140,10 +165,10 @@ const AdoptionList = () => {
                         <Typography variant="body1">Submission Date: {adoption.submissionDate}</Typography>
                         <Typography variant="body1">Status: {adoption.status}</Typography>
                         <div style={styles.buttonContainer}>
-                            <IconButton color="primary" onClick={() => handleEditClick(adoption)}>
+                        <IconButton color="primary" onClick={() => handleEditClick(adoption)}>
                                 <EditIcon />
                             </IconButton>
-                            <IconButton color="primary" onClick={() => handleDeleteClick(adoption.adoptionID)}>
+                            <IconButton color="primary">
                                 <DeleteIcon />
                             </IconButton>
                         </div>
@@ -163,11 +188,17 @@ const AdoptionList = () => {
                         <Typography variant="body1">Type: {rehome.type}</Typography>
                         <Typography variant="body1">Breed: {rehome.breed}</Typography>
                         <Typography variant="body1">Age: {rehome.age}</Typography>
+                        <Typography variant="body1">Gender: {rehome.gender}</Typography>
+                        <Typography variant="body1">Description: {rehome.description}</Typography>
+                        <Typography variant="body1">User Name: {rehome.userName}</Typography>
+                        <Typography variant="body1">Address: {rehome.address}</Typography>
+                        <Typography variant="body1">Contact Number: {rehome.contactNumber}</Typography>
+                        <Typography variant="body1">Submission Date: {rehome.submissionDate}</Typography>
                         <Typography variant="body1">Status: {rehome.status}</Typography>
                         <div style={styles.buttonContainer}>
-                        <IconButton color="primary" onClick={() => handleEditRehomeClick(rehome)}>
-                            <EditIcon /> 
-                        </IconButton>
+                            <IconButton color="primary" onClick={() => handleEditRehomeClick(rehome)}>
+                                <EditIcon />
+                            </IconButton>
                             <IconButton color="primary">
                                 <DeleteIcon />
                             </IconButton>
@@ -177,6 +208,7 @@ const AdoptionList = () => {
             </Grid>
         ))
     );
+    
 
     return (
         <div style={styles.container}>
@@ -205,50 +237,6 @@ const AdoptionList = () => {
                     <Grid container spacing={2}>
                         {renderAdoptionCards(adoptions.filter(adoption => adoption.status === 'REJECTED'))}
                     </Grid>
-                    <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
-                <DialogTitle>Edit Adoption Status</DialogTitle>
-                <DialogContent>
-                    {editAdoption && (
-                        <Select
-                            label="Status"
-                            value={editAdoption.status}
-                            onChange={(e) => setEditAdoption({ ...editAdoption, status: e.target.value })}
-                            variant="outlined"
-                            fullWidth
-                            sx={{ marginBottom: 2 }}
-                        >
-                            <MenuItem value="APPROVED">Approved</MenuItem>
-                            <MenuItem value="REJECTED">Rejected</MenuItem>
-                        </Select>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleEditAdoption} variant="contained">Save</Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
-                <DialogTitle>Confirm Update</DialogTitle>
-                <DialogContent>
-                    <Typography>Are you sure you want to update this record?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleConfirmUpdate} variant="contained" color="primary">Do it</Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <Typography>Are you sure you want to delete this record?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleDelete} variant="contained" color="primary">Delete</Button>
-                </DialogActions>
-            </Dialog>
                 </Grid>
 
                 {/* Right Column for Rehome */}
@@ -258,46 +246,33 @@ const AdoptionList = () => {
                         {renderRehomeCards(rehomes.filter(rehome => rehome.status === 'PENDING_REHOME'))}
                     </Grid>
 
-                    <Typography variant="h6" sx={styles.centeredRightHeading}>Accepted Rehome</Typography>
+                    <Typography variant="h6" sx={styles.centeredRightHeading}>Approved Rehome</Typography>
                     <Grid container spacing={2}>
                         {renderRehomeCards(rehomes.filter(rehome => rehome.status === 'ACCEPTED_REHOME'))}
                     </Grid>
-                    <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
-                <DialogTitle>Edit Rehome Status</DialogTitle>
-                <DialogContent>
-                    {editRehome && (
-                        <Select
-                            label="Status"
-                            value={editRehome.status}
-                            onChange={(e) => setEditRehome({ ...editRehome, status: e.target.value })}
-                            variant="outlined"
-                            fullWidth
-                            sx={{ marginBottom: 2 }}
-                        >
-                            <MenuItem value="ACCEPTED_REHOME">Accepted</MenuItem>
-                            <MenuItem value="REJECTED_REHOME">Rejected</MenuItem>
-                        </Select>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleEditRehome} variant="contained">Save</Button>
-                </DialogActions>
-            </Dialog>
+                    
 
-            {/* Delete Confirmation Dialog */}
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                    <DialogContent>
-                        <Typography>Are you sure you want to delete this record?</Typography>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleDelete} variant="contained" color="primary">Delete</Button>
-                    </DialogActions>
-            </Dialog>
                 </Grid>
             </Grid>
+
+            <Dialog open={editDialogOpen} onClose={handleDialogClose}>
+    <DialogTitle>{editAdoption ? "Edit Adoption Status" : "Edit Rehome Status"}</DialogTitle>
+    <DialogContent>
+        <Select value={newStatus} onChange={handleStatusChange} fullWidth>
+            <MenuItem value="APPROVED">Approved</MenuItem>
+            <MenuItem value="REJECTED">Rejected</MenuItem>
+        </Select>
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={handleDialogClose} color="secondary">
+            Cancel
+        </Button>
+        <Button onClick={editAdoption ? handleSaveStatus : handleSaveRehomeStatus} color="primary">
+            Save
+        </Button>
+    </DialogActions>
+</Dialog>
+
 
             <Snackbar open={!!successMessage} autoHideDuration={6000} onClose={() => setSuccessMessage('')} message={successMessage} />
 

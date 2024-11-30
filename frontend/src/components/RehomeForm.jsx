@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { TextField, Button, Typography, Snackbar, Box, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import axios from "axios";
-import { TextField, Button, Typography, Snackbar } from "@mui/material";
 
 const RehomeForm = () => {
   const [formData, setFormData] = useState({
@@ -13,14 +13,27 @@ const RehomeForm = () => {
     contactNumber: "",
     submissionDate: "",
     age: "",
-    gender: "",
+    gender: "",  // Gender field
+    userName: "", // Add userName here
   });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setPetData({
+        ...petData,
+        image: file,
+    });
+};
+
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
+    // Allow only numeric input for contactNumber
+    if (name === "contactNumber" && !/^\d*$/.test(value)) return; // Restrict non-numeric input
+
     setFormData((prev) => ({
       ...prev,
       [name]: name === "image" ? files[0] : value,  // Handle file input separately
@@ -37,16 +50,18 @@ const RehomeForm = () => {
     form.append("breed", formData.breed);
     form.append("age", formData.age); // Add age
     form.append("gender", formData.gender); // Add gender
-    form.append("description", formData.description);
+    form.append("description", formData.petDescription);
     form.append("photo", formData.image);  // Append image
+    form.append("userName", formData.userName); 
     form.append("address", formData.address);
     form.append("contactNumber", formData.contactNumber);
     form.append("submissionDate", formData.submissionDate);
     form.append("status", "PENDING_REHOME"); // Set status to pending rehome
 
+    resetForm();
+
     try {
-      // Send the form data including the image to the backend
-      const response = await axios.post("http://localhost:8080/api/pet/postpetrecord", form, {
+        await axios.post("http://localhost:8080/api/pet/postpetrecord", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setSuccessMessage("Pet successfully rehomed!");
@@ -55,6 +70,22 @@ const RehomeForm = () => {
       setSuccessMessage("");
       setErrorMessage("There was an error rehoming the pet. Please try again.");
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      petType: '',
+      breed: '',
+      age: '',
+      gender: '', // Reset gender
+      petDescription: '',
+      image: null, // assuming the file input is handled as null initially
+      userName: '',
+      address: '',
+      contactNumber: '',
+      submissionDate: ''
+    });
   };
 
   const styles = {
@@ -86,7 +117,6 @@ const RehomeForm = () => {
       justifyContent: "center",
     },
   };
-  
 
   return (
     <div style={styles.container}>
@@ -132,20 +162,26 @@ const RehomeForm = () => {
             type="number"
             sx={{ marginBottom: 2 }}
           />
-          <TextField
-            label="Gender"
-            name="gender"
-            fullWidth
-            value={formData.gender}
-            onChange={handleChange}
-            required
-            sx={{ marginBottom: 2 }}
-          />
+
+          {/* Gender dropdown */}
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Gender</InputLabel>
+            <Select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required
+            >
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             label="Description"
             name="description"
             fullWidth
-            value={formData.description}
+            value={formData.formDescription}
             onChange={handleChange}
             required
             multiline
@@ -163,12 +199,13 @@ const RehomeForm = () => {
           />
         </div>
 
+        {/* Adopter's Info */}
         <div style={styles.rightColumn}>
           <TextField
-            label="Name of User"
-            name="name"
+            label="Your Name"
+            name="userName"
             fullWidth
-            value={formData.name}
+            value={formData.userName}
             onChange={handleChange}
             required
             sx={{ marginBottom: 2 }}
@@ -193,18 +230,22 @@ const RehomeForm = () => {
             sx={{ marginBottom: 2 }}
           />
           <TextField
-                        label="Submission Date"
-                        type="date"
-                        name="submissionDate"
-                        value={formData.submissionDate}
-                        onChange={handleChange}
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: new Date().toISOString().split('T')[0] }}
-                        variant="outlined"
-                        required
-                        fullWidth
-                        sx={{ marginBottom: 2 }}
-                    />
+  label="Submission Date"
+  type="date"
+  name="submissionDate"
+  value={formData.submissionDate || new Date().toISOString().split('T')[0]} // Set today's date by default
+  onChange={handleChange}
+  InputLabelProps={{ shrink: true }}
+  inputProps={{
+    min: new Date().toISOString().split('T')[0], // today's date as the minimum
+    max: new Date().toISOString().split('T')[0]  // today's date as the maximum
+  }}
+  variant="outlined"
+  required
+  fullWidth
+  sx={{ marginBottom: 2 }}
+/>
+
         </div>
       </div>
       <div style={styles.buttonContainer}>
@@ -221,19 +262,33 @@ const RehomeForm = () => {
           Confirm Rehome
         </Button>
       </div>
+
+      {/* Success Snackbar */}
       <Snackbar
         open={!!successMessage}
         autoHideDuration={6000}
-        message={successMessage}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={() => setSuccessMessage("")}
+        message={successMessage}
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: '#5A20A8',
+            color: 'white'
+          }
+        }}
       />
+
+      {/* Error Snackbar */}
       <Snackbar
         open={!!errorMessage}
-        autoHideDuration={6000}
-        message={errorMessage}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={4000}
         onClose={() => setErrorMessage("")}
+        message={errorMessage}
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: '#5A20A8',
+            color: 'white'
+          }
+        }}
       />
     </div>
   );

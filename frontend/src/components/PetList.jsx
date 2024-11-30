@@ -19,7 +19,6 @@ import AdoptionForm from './AdoptionForm';
 import RehomeForm from './RehomeForm';
 import goldenImage from '../assets/golden_retriever.jpg';
 import siameseImage from '../assets/siamese.jpg';
-import cockatielImage from '../assets/cockatiel.jpg';
 
 const PetList = () => {
   const [openAdoption, setOpenAdoption] = useState(false);
@@ -48,16 +47,6 @@ const PetList = () => {
       gender: 'Female',
       description: 'An affectionate and playful breed.',
     },
-    {
-      petId: 'P003', // Added Pet ID
-      image: cockatielImage,
-      breed: 'Cockatiel',
-      type: 'Bird',
-      name: 'Sunny',
-      age: 1,
-      gender: 'Male',
-      description: 'A social and curious companion.',
-    },
   ];
 
   const handleCardClick = (pet) => {
@@ -73,13 +62,17 @@ const PetList = () => {
   const handleRehomeClick = () => {
     setOpenRehome(true);
   };
+  const fetchRecords = async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/api/pet/getAllPets");
+        setPets(response.data);  // Assuming you have a state called 'pets' for PetList
+    } catch (error) {
+        console.error("Failed to fetch updated PetList", error);
+    }
+};
 
   const handleRehomeClose = () => {
     setOpenRehome(false);
-  };
-
-  const handleListOpen = () => {
-    navigate('/admin/adoption-list');
   };
 
   return (
@@ -275,23 +268,6 @@ const PetList = () => {
           }}
         >
           Rehome
-        </ToggleButton>
-        <ToggleButton
-          onClick={handleListOpen}
-          sx={{
-            border: '2px solid',
-            borderRadius: '25px',
-            padding: '12px 36px',
-            borderColor: '#6c5ce7',
-            backgroundColor: '#6c5ce7',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: 'white',
-              color: '#6c5ce7',
-            },
-          }}
-        >
-          Admin
         </ToggleButton>
       </Box>
     </>

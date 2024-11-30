@@ -7,11 +7,11 @@ const AdoptionForm = ({ pet }) => {
         name: '',
         address: '',
         contactNumber: '',
-        submissionDate: '',
+        adoptionDate: '',
         breed: pet ? pet.breed : '',
-        petDescription: pet ? pet.description : '',
-        petType: pet ? pet.type : ''
-    });
+        description: pet ? pet.description : '', // Change from petDescription to description
+        petType: pet ? pet.type : '',
+    });    
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -58,6 +58,8 @@ const AdoptionForm = ({ pet }) => {
 
         const newAdoption = {
             ...formData,
+            adoptionDate: formData.adoptionDatei,
+            description: pet ? pet.description : formData.description,
             status: 'PENDING',
             adoptionID: Date.now(),
         };
@@ -77,7 +79,7 @@ const AdoptionForm = ({ pet }) => {
             name: '',
             address: '',
             contactNumber: '',
-            submissionDate: '',
+            adoptionDate: '',
             breed: pet ? pet.breed : '',
             petDescription: pet ? pet.description : '',
             petType: pet ? pet.type : ''
@@ -117,15 +119,14 @@ const AdoptionForm = ({ pet }) => {
                     />
                     <TextField
                         label="Pet Description"
-                        name="petDescription"
-                        value={formData.petDescription}
+                        name="description" // Change name to 'description'
+                        value={formData.description}
                         variant="outlined"
-                        multiline
-                        rows={3}
                         fullWidth
                         disabled
                         sx={{ marginBottom: 2 }}
                     />
+
                 </div>
 
                 <div style={styles.rightColumn}>
@@ -174,10 +175,13 @@ const AdoptionForm = ({ pet }) => {
                         label="Submission Date"
                         type="date"
                         name="submissionDate"
-                        value={formData.submissionDate}
+                        value={formData.adoptionDate || new Date().toISOString().split('T')[0]} // Set today's date by default
                         onChange={handleChange}
                         InputLabelProps={{ shrink: true }}
-                        inputProps={{ min: new Date().toISOString().split('T')[0] }}
+                        inputProps={{
+                            min: new Date().toISOString().split('T')[0], // today's date as the minimum
+                            max: new Date().toISOString().split('T')[0]  // today's date as the maximum
+                        }}
                         variant="outlined"
                         required
                         fullWidth
@@ -202,6 +206,7 @@ const AdoptionForm = ({ pet }) => {
                     color: 'white',
                     marginTop: '20px',
                 }}
+                onClick={handleSubmit}
             >
                 Submit Adoption
             </Button>

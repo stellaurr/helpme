@@ -16,11 +16,13 @@ public class AdoptionEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private String name;                // Name of the person applying for adoption
-    private String address;             // Address of the applicant
-    private String contactNumber;       // Contact number of the applicant
-    private String petType;             // Type of pet being adopted
-    private LocalDate submissionDate;   // Submission date for the adoption application
+    private String name;                
+    private String address;             
+    private String contactNumber;      
+    private String petType;             
+    private String breed;               
+    private String description;         
+    private LocalDate submissionDate;   
 
     public enum Status {
         PENDING, APPROVED, REJECTED
@@ -29,9 +31,10 @@ public class AdoptionEntity {
     public AdoptionEntity() {
         this.adoptionDate = LocalDate.now();
         this.status = Status.PENDING; 
-        this.submissionDate = LocalDate.now(); // Initialize submission date to current date
+        this.submissionDate = LocalDate.now(); 
     }
 
+    // Getter and setter methods
     public Long getAdoptionID() {
         return adoptionID;
     }
@@ -88,6 +91,22 @@ public class AdoptionEntity {
         this.petType = petType;
     }
 
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public LocalDate getSubmissionDate() {
         return submissionDate;
     }
@@ -107,6 +126,7 @@ public class AdoptionEntity {
 
     public String viewAdoptionStatus() {
         return "Adoption ID: " + adoptionID + ", Status: " + status + 
-               ", Name: " + name + ", Type of Pet: " + petType;
+               ", Name: " + name + ", Type of Pet: " + petType +
+               ", Breed: " + breed + ", Description: " + description;
     }
 }

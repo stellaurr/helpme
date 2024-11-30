@@ -5,6 +5,7 @@ import { People, Favorite, Pets, Event, Settings, Logout } from '@mui/icons-mate
 const sections = [
     { label: 'Users', icon: <People /> },
     { label: 'Adoptions', icon: <Favorite /> },
+    { label: 'Rehome', icon: <Favorite /> },
     { label: 'Sponsorships', icon: <Pets /> },
     { label: 'Lost and Found', icon: <Event /> },
     { label: 'Volunteers', icon: <People /> },

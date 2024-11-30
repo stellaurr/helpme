@@ -49,6 +49,10 @@ public class PetService {
             pet.setDescription(newPetDetails.getDescription());
             pet.setPhoto(newPetDetails.getPhoto());
             pet.setStatus(newPetDetails.getStatus());
+            pet.setUserName(newPetDetails.getUserName());
+            pet.setAddress(newPetDetails.getAddress());
+            pet.setContactNumber(newPetDetails.getContactNumber());
+            pet.setSubmissionDate(newPetDetails.getSubmissionDate());
 
         }catch(IllegalArgumentException nex){
             System.out.println("Pet " + pid + "not found.");

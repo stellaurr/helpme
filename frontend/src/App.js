@@ -6,8 +6,6 @@ import UserDashboard from "./components/UserDashboard";
 import Home from "./components/Home";
 import LostAndFound from "./components/LostAndFound";
 import Sponsor from "./components/Sponsor";
-import AdoptionForm from "./components/AdoptionForm";
-import AdoptionList from "./components/AdoptionList";
 import DonationForm from "./components/DonationForm";
 import DonationTable from "./components/DonationTable";
 import VolunteerSignUp from "./components/VolunteerSignUpList";
@@ -22,6 +20,7 @@ import Navbar from "./components/Navbar";
 import PetList from "./components/PetList";
 import AdminDashboard from "./components/AdminDashboard";
 import { UserProvider } from "./components/UserContext";
+
 
 const theme = createTheme({
   palette: {
@@ -61,11 +60,10 @@ function App() {
             path="/admin/manage-volunteers"
             element={<VolunteerSignUp />}
           />
-          <Route path="/admin/adoption-list" element={<AdoptionList />} />
           <Route path="/opportunity/:id" element={<OpportunityDetail />} />
           <Route path="/book" element={<CreateOpportunity />} />
           <Route path="/admin" element={<AdminDashboard/>} />
-          
+
         </Routes>
       </Router>
     </ThemeProvider>
