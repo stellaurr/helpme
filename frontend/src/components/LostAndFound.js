@@ -1,5 +1,5 @@
 import React from "react";
-import NewsFeed from "./NewsFeed";
+import NewsFeed from "./LostAndFound/NewsFeed";
 
 const LostAndFound = () => {
   return (

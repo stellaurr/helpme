@@ -9,135 +9,105 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/lostandfound")
+@CrossOrigin
 public class LostAndFoundController {
 
-    private final LostAndFoundService lostAndFoundService;
-
     @Autowired
-    public LostAndFoundController(LostAndFoundService lostAndFoundService) {
-        this.lostAndFoundService = lostAndFoundService;
+    private LostAndFoundService service;
+
+    @PostMapping
+    public ResponseEntity<String> createReport(
+            @RequestParam("reporttype") String reporttype,
+            @RequestParam("petcategory") String petcategory,
+            @RequestParam("datereported") String datereported,
+            @RequestParam("lastseen") String lastseen,
+            @RequestParam("description") String description,
+            @RequestParam("creatorid") int creatorid,
+            @RequestParam(value = "imagefile", required = false) MultipartFile imageFile) {
+
+        Date date;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(datereported);
+        } catch (ParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format. Use yyyy-MM-dd.");
+        }
+
+        LostAndFoundEntity report = new LostAndFoundEntity();
+        report.setReporttype(reporttype);
+        report.setPetcategory(petcategory);
+        report.setDatereported(date);
+        report.setLastseen(lastseen);
+        report.setDescription(description);
+        report.setCreatorid(creatorid);
+
+        System.out.println("Report Type: " + reporttype);
+        System.out.println("Pet Category: " + petcategory);
+        System.out.println("Date Reported: " + datereported);
+        System.out.println("Last Seen: " + lastseen);
+        System.out.println("Description: " + description);
+        System.out.println("Creator ID: " + creatorid);
+        if (imageFile != null) {
+            System.out.println("Image File Name: " + imageFile.getOriginalFilename());
+        }
+
+        service.createReport(report, imageFile);
+        return ResponseEntity.ok("Report created successfully.");
     }
 
     @GetMapping
-    public List<LostAndFoundEntity> getAllReports() {
-        return lostAndFoundService.getAllReports();
+    public ResponseEntity<List<LostAndFoundEntity>> getAllReports() {
+        List<LostAndFoundEntity> reports = service.getAllReports();
+        return ResponseEntity.ok(reports);
     }
 
-    @GetMapping("/{reportID}")
-    public ResponseEntity<LostAndFoundEntity> getReportById(@PathVariable int reportID) {
-        return lostAndFoundService.getReportById(reportID)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-public ResponseEntity<String> createReport(
-        @RequestParam("reportType") String reportType,
-        @RequestParam("petCategory") String petCategory,
-        @RequestParam("dateReported") String dateReported,
-        @RequestParam("lastSeen") String lastSeen,
-        @RequestParam("description") String description,
-        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
-
-    if (reportType == null || description == null || lastSeen == null) {
-        return ResponseEntity.badRequest().body("All fields except image are required.");
-    }
-
-    byte[] image = null;
-    if (imageFile != null && !imageFile.isEmpty()) {
-        image = imageFile.getBytes();
-    }
-
-    Date parsedDate;
-    try {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        parsedDate = dateFormat.parse(dateReported);
-    } catch (ParseException e) {
-        return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
-    }
-
-    LostAndFoundEntity report = new LostAndFoundEntity();
-    report.setDateReported(parsedDate);
-    report.setReportType(reportType);
-    report.setDescription(description);
-    report.setLastSeen(lastSeen);
-    report.setImage(image);
-    report.setPetCategory(petCategory);
-
-    lostAndFoundService.createReport(report);
-
-    return ResponseEntity.ok("Report submitted successfully");
-}
-
-
-    @PutMapping("/{reportID}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateReport(
-            @PathVariable int reportID,
-            @RequestParam("reportType") String reportType,
-            @RequestParam("petCategory") String petCategory,
-            @RequestParam("dateReported") String dateReported,
-            @RequestParam("lastSeen") String lastSeen,
+            @PathVariable int id,
+            @RequestParam("reporttype") String reporttype,
+            @RequestParam("petcategory") String petcategory,
+            @RequestParam("datereported") String datereported,
+            @RequestParam("lastseen") String lastseen,
             @RequestParam("description") String description,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+            @RequestParam(value = "imagefile", required = false) MultipartFile imageFile) {
 
-        
-        if (reportType == null || description == null || lastSeen == null) {
-            return ResponseEntity.badRequest().body("All fields are required except the image file.");
-        }
-
-        LostAndFoundEntity existingReport = lostAndFoundService.getReportById(reportID).orElse(null);
-        if (existingReport == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            existingReport.setImage(imageFile.getBytes());
-        } else {
-            existingReport.setImage(existingReport.getImage());
-        }
-
-        Date parsedDate;
+        Date date;
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            parsedDate = dateFormat.parse(dateReported);
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(datereported);
         } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("Invalid date format. Please use yyyy-MM-dd.");
+            return ResponseEntity.badRequest().body("Invalid date format. Use yyyy-MM-dd.");
         }
 
-        // Update fields
-        existingReport.setDateReported(parsedDate);
-        existingReport.setReportType(reportType);
-        existingReport.setPetCategory(petCategory);
-        existingReport.setDescription(description);
-        existingReport.setLastSeen(lastSeen);
+        LostAndFoundEntity updatedReport = new LostAndFoundEntity();
+        updatedReport.setReporttype(reporttype);
+        updatedReport.setPetcategory(petcategory);
+        updatedReport.setDatereported(date);
+        updatedReport.setLastseen(lastseen);
+        updatedReport.setDescription(description);
 
-        lostAndFoundService.updateReport(reportID, existingReport);
-
-        return ResponseEntity.ok("Report updated successfully");
+        try {
+            service.updateReport(id, updatedReport, imageFile);
+            return ResponseEntity.ok("Report updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-
-
-    @DeleteMapping("/{reportID}")
-    public ResponseEntity<Void> deleteReport(@PathVariable int reportID) {
-        return lostAndFoundService.deleteReport(reportID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteReport(@PathVariable int id) {
+        try {
+            service.deleteReport(id);
+            return ResponseEntity.ok("Report deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @GetMapping("/lastseen/{lastSeen}")
-    public ResponseEntity<List<LostAndFoundEntity>> findByLastSeen(@PathVariable String lastSeen) {
-        List<LostAndFoundEntity> results = lostAndFoundService.findByLastSeen(lastSeen);
-        return results.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(results);
-    }
-
-    @GetMapping("/api/lostandfound/search")
-    public List<LostAndFoundEntity> searchReports(@RequestParam String location) {
-        return lostAndFoundService.searchReports(location);
-    }
 }

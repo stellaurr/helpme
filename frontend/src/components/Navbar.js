@@ -64,12 +64,13 @@ const Navbar = () => {
 
     return (
         <AppBar
-            position="static"
+            position="fixed"
             color="inherit"
             elevation={0}
             sx={{
+                zIndex: 1300, // To ensure it stays above other elements
+                top: 0,
                 padding: "8px",
-                position: "relative",
                 borderBottom: "60px solid",
                 borderColor: "primary.main",
             }}
@@ -224,7 +225,7 @@ const Navbar = () => {
                                 }}
                             >
                                 <AccountCircleIcon sx={{ marginRight: "5px" }} />
-                                {user.firstName}
+                                {user.username}
                             </Box>
                             <Menu
                                 anchorEl={profileAnchorEl}
