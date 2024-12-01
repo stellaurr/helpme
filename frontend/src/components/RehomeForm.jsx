@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { TextField, Button, Typography, Snackbar, Box, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import axios from "axios";
 
@@ -18,6 +18,8 @@ const RehomeForm = () => {
   });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const fileInputRef = useRef(null); 
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -50,7 +52,7 @@ const RehomeForm = () => {
     form.append("breed", formData.breed);
     form.append("age", formData.age); // Add age
     form.append("gender", formData.gender); // Add gender
-    form.append("description", formData.petDescription);
+    form.append("description", formData.description);
     form.append("photo", formData.image);  // Append image
     form.append("userName", formData.userName); 
     form.append("address", formData.address);
@@ -79,14 +81,18 @@ const RehomeForm = () => {
       breed: '',
       age: '',
       gender: '', // Reset gender
-      petDescription: '',
-      image: null, // assuming the file input is handled as null initially
+      description: '',
+      image: null, // Reset image
       userName: '',
       address: '',
       contactNumber: '',
       submissionDate: ''
     });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Reset file input using ref
+    }
   };
+  
 
   const styles = {
     container: {
@@ -181,7 +187,7 @@ const RehomeForm = () => {
             label="Description"
             name="description"
             fullWidth
-            value={formData.formDescription}
+            value={formData.description}
             onChange={handleChange}
             required
             multiline
@@ -195,6 +201,7 @@ const RehomeForm = () => {
             onChange={handleChange}
             accept="image/*"
             required
+            ref={fileInputRef}
             style={{ marginBottom: "16px", display: "block" }}
           />
         </div>

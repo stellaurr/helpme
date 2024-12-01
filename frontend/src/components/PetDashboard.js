@@ -21,12 +21,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const PetDashboard = () => {
     const [rehomes, setRehomes] = useState([]); // State to store rehome records
     const [editRehome, setEditRehome] = useState(null);
-    const [newStatus, setNewStatus] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
-    const [error, setError] = useState('');
+    const [newStatus, setNewStatus] = useState(''); 
+    const [successMessage, setSuccessMessage] = useState(''); 
+    const [error, setError] = useState(''); 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false); // State for confirmation dialog
-    const [deleteRehomeId, setDeleteRehomeId] = useState(null); // Store ID of the rehome to delete
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false); 
+    const [deleteRehomeId, setDeleteRehomeId] = useState(null);
 
     // Fetch rehome records
     useEffect(() => {
@@ -43,9 +43,9 @@ const PetDashboard = () => {
     }, []);
 
     const handleEditRehomeClick = (rehome) => {
-        setEditRehome(rehome); // Set the rehome being edited
-        setNewStatus(rehome.status); // Pre-fill the status dropdown
-        setEditDialogOpen(true); // Open the dialog
+        setEditRehome(rehome); 
+        setNewStatus(rehome.status); 
+        setEditDialogOpen(true); 
     };
 
     const handleStatusChange = (event) => {
@@ -54,9 +54,9 @@ const PetDashboard = () => {
 
     const handleDialogClose = () => {
         setEditDialogOpen(false);
-        setConfirmDialogOpen(false); // Close the confirmation dialog
+        setConfirmDialogOpen(false); 
         setEditRehome(null);
-        setDeleteRehomeId(null); // Reset the delete ID when dialog is closed
+        setDeleteRehomeId(null); 
     };
 
     const handleSaveRehomeStatus = async () => {
@@ -69,9 +69,9 @@ const PetDashboard = () => {
                     age: editRehome.age,
                     gender: editRehome.gender,
                     description: editRehome.description,
-                    photo: editRehome.photo, // Assuming the photo is part of the rehome data
-                    status: 'AVAILABLE', // Set the status to "AVAILABLE" when adding to PetList
-                    userName: editRehome.userName, // Assuming these fields are part of the rehome
+                    photo: editRehome.photo, 
+                    status: 'AVAILABLE', 
+                    userName: editRehome.userName,
                     address: editRehome.address,
                     contactNumber: editRehome.contactNumber,
                     submissionDate: editRehome.submissionDate,
@@ -96,7 +96,7 @@ const PetDashboard = () => {
 
     const handleDeleteRehomeClick = (rehomeId) => {
         setDeleteRehomeId(rehomeId);
-        setConfirmDialogOpen(true); // Open the confirmation dialog
+        setConfirmDialogOpen(true); 
     };
 
     const handleDeleteRehome = async () => {
@@ -112,44 +112,42 @@ const PetDashboard = () => {
     };
 
     const renderRehomeCards = (rehomeList) => (
-    rehomeList.map((rehome) => (
-        <Grid item xs={12} sm={6} md={3} key={rehome.pid}>
-            <Card style={styles.card}>
-                <CardContent>
-                    <Typography variant="h6" style={styles.textShade}>ID: {rehome.pid}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Name: {rehome.name}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Type: {rehome.type}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Breed: {rehome.breed}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Age: {rehome.age}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Gender: {rehome.gender}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Description: {rehome.description}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>User Name: {rehome.userName}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Address: {rehome.address}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Contact Number: {rehome.contactNumber}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Submission Date: {rehome.submissionDate}</Typography>
-                    <Typography variant="body1" style={styles.textShade}>Status: {rehome.status}</Typography>
+        rehomeList.map((rehome) => (
+            <Grid item xs={12} sm={6} md={3} key={rehome.pid}>
+                <Card style={styles.card}>
+                    <CardContent>
+                        <Typography variant="h6" style={styles.textShade}>ID: {rehome.pid}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Name: {rehome.name}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Type: {rehome.type}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Breed: {rehome.breed}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Age: {rehome.age}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Gender: {rehome.gender}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Description: {rehome.description}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>User Name: {rehome.userName}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Address: {rehome.address}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Contact Number: {rehome.contactNumber}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Submission Date: {rehome.submissionDate}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Status: {rehome.status}</Typography>
 
-                    {/* Display the image */}
-                    {rehome.photo && (
-                        <div style={styles.imageContainer}>
-                            <img src={rehome.photo} alt={rehome.name} style={styles.image} />
+                        {rehome.photo && (
+                            <div style={styles.imageContainer}>
+                                <img src={rehome.photo} alt={rehome.name} style={styles.image} />
+                            </div>
+                        )}
+
+                        <div style={styles.buttonContainer}>
+                            <IconButton color="primary" onClick={() => handleEditRehomeClick(rehome)}>
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton color="secondary" onClick={() => handleDeleteRehomeClick(rehome.pid)}>
+                                <DeleteIcon />
+                            </IconButton>
                         </div>
-                    )}
-
-                    <div style={styles.buttonContainer}>
-                        <IconButton color="primary" onClick={() => handleEditRehomeClick(rehome)}>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton color="secondary" onClick={() => handleDeleteRehomeClick(rehome.pid)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </div>
-                </CardContent>
-            </Card>
-        </Grid>
-    ))
-);
-
+                    </CardContent>
+                </Card>
+            </Grid>
+        ))
+    );
 
     return (
         <div style={styles.container}>
@@ -218,15 +216,23 @@ const styles = {
     },
     buttonContainer: {
         marginTop: '10px',
+    },
+    imageContainer: {
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+    },
+    image: {
+        width: '100%',
+        maxHeight: '200px',
+        objectFit: 'cover',
+    },
+    textShade: {
+        color: '#424242',
     },
     centeredHeading: {
         textAlign: 'center',
-        fontFamily: "'Arial', sans-serif",
-        fontWeight: 'bold',
-        color: '#5A20A8',
-        marginBottom: '10px',
+        marginBottom: '20px',
+        marginTop: '40px',
     },
 };
 

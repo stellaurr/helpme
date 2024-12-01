@@ -27,38 +27,46 @@ public class PetController {
     }
 
     @PostMapping("/postpetrecord")
-    public PetEntity postPetRecord(@RequestParam("name") String name,
-                                   @RequestParam("type") String type,
-                                   @RequestParam("breed") String breed,
-                                   @RequestParam("age") int age,
-                                   @RequestParam("gender") String gender,
-                                   @RequestParam("description") String description,
-                                   @RequestParam("photo") MultipartFile photo,
-                                   @RequestParam("status") String status,
-                                   @RequestParam("userName") String userName, // New parameter for user name
-                                   @RequestParam("address") String address,   // New parameter for address
-                                   @RequestParam("contactNumber") String contactNumber, // New parameter for contact number
-                                   @RequestParam("submissionDate") String submissionDate) { // New parameter for submission date
-        try {
-            // Save photo to a directory (adjust the path as necessary)
-            String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
-            Path uploadDir = Paths.get("uploads/pets");
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir); // Create directory if it doesn't exist
-            }
-
-            Path filePath = uploadDir.resolve(fileName);
-            photo.transferTo(filePath); // Save the file to the server
-
-            // Create a new PetEntity with user details and save it
-            PetEntity pet = new PetEntity(0, name, type, breed, age, gender, description, fileName, status, userName, address, contactNumber, submissionDate);
-            return pserv.postPetRecord(pet);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null; // Handle the error appropriately
+public PetEntity postPetRecord(@RequestParam("name") String name,
+                               @RequestParam("type") String type,
+                               @RequestParam("breed") String breed,
+                               @RequestParam("age") int age,
+                               @RequestParam("gender") String gender,
+                               @RequestParam("description") String description,
+                               @RequestParam("photo") MultipartFile photo,
+                               @RequestParam("status") String status,
+                               @RequestParam("userName") String userName,
+                               @RequestParam("address") String address,
+                               @RequestParam("contactNumber") String contactNumber,
+                               @RequestParam("submissionDate") String submissionDate) {
+    try {
+        if (photo == null || photo.isEmpty()) {
+            throw new IllegalArgumentException("Photo is required for pet rehome records.");
         }
+
+        // Save photo to a directory
+        String fileName = StringUtils.cleanPath(photo.getOriginalFilename());
+        Path uploadDir = Paths.get("uploads/pets");
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+
+        Path filePath = uploadDir.resolve(fileName);
+        photo.transferTo(filePath);
+
+        // Generate file URL
+        String fileUrl = "http://localhost:8080/uploads/pets/" + fileName;
+
+        // Create and save PetEntity
+        PetEntity pet = new PetEntity(0, name, type, breed, age, gender, description, fileUrl, status, userName, address, contactNumber, submissionDate);
+        return pserv.postPetRecord(pet);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null; // Handle and log this error appropriately
     }
+}
+
 
     @GetMapping("/getAllPets")
     public List<PetEntity> getAllPets(){
@@ -80,5 +88,4 @@ public class PetController {
         return pserv.deletePet(pid);
     }
 }
-
 

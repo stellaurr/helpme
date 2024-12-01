@@ -156,4 +156,3 @@ public class PetEntity {
         this.status = status;
     }
 }
-

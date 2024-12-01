@@ -25,6 +25,7 @@ const PetList = () => {
   const [openRehome, setOpenRehome] = useState(false); // Add this line
   const [selectedPet, setSelectedPet] = useState(null);
   const navigate = useNavigate();
+  
 
   const pets = [
     {
