@@ -72,7 +72,6 @@ const PetDashboard = ({ onPetAdded = () => {} }) => {
                     setRehomes((prev) => prev.filter((rehome) => rehome.pid !== editRehome.pid));
                     setSuccessMessage('Rehome record rejected and deleted.');
                 } else if (newStatus === 'ACCEPTED_REHOME') {
-                    // Update the status using the correct endpoint structure
                     await axios.put(`http://localhost:8080/api/pet/putPetDetails`, petToUpdate, {
                         params: {
                             pid: editRehome.pid // Ensure this is the correct ID
@@ -88,6 +87,9 @@ const PetDashboard = ({ onPetAdded = () => {} }) => {
                         )
                     );
                     setSuccessMessage('Rehome approved.');
+
+                    // Notify PetList of the updated pet
+                    onPetAdded(petToUpdate); // Pass the updated pet data to PetList
                 }
             }
         } catch (error) {
