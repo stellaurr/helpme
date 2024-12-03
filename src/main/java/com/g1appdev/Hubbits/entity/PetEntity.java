@@ -40,6 +40,7 @@ public class PetEntity {
         this.name = name;
         this.type = type;
         this.age = age;
+        this.breed = breed;
         this.gender = gender;
         this.description = description;
         this.photo = photo;

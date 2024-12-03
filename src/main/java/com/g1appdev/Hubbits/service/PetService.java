@@ -36,28 +36,14 @@ public class PetService {
     // Update a record
     @SuppressWarnings("finally")
     public PetEntity putPetDetails(int pid, PetEntity newPetDetails){
-        PetEntity pet = new PetEntity();
+        PetEntity pet = prepo.findById(pid).orElse(null); // Get the existing pet
 
-        try{
-            pet = prepo.findById(pid).get();
-
-            pet.setName(newPetDetails.getName());
-            pet.setType(newPetDetails.getType());
-            pet.setBreed(newPetDetails.getBreed());
-            pet.setAge(newPetDetails.getAge());
-            pet.setGender(newPetDetails.getGender());
-            pet.setDescription(newPetDetails.getDescription());
-            pet.setPhoto(newPetDetails.getPhoto());
-            pet.setStatus(newPetDetails.getStatus());
-            pet.setUserName(newPetDetails.getUserName());
-            pet.setAddress(newPetDetails.getAddress());
-            pet.setContactNumber(newPetDetails.getContactNumber());
-            pet.setSubmissionDate(newPetDetails.getSubmissionDate());
-
-        }catch(IllegalArgumentException nex){
-            System.out.println("Pet " + pid + "not found.");
-        }finally{
-            return prepo.save(pet);
+        if (pet != null) { // Only update if the pet exists
+            pet.setStatus(newPetDetails.getStatus()); // Update only the status
+            return prepo.save(pet); // Save the updated pet
+        } else {
+            System.out.println("Pet " + pid + " not found.");
+            return null; // Handle the case where the pet does not exist
         }
     }
 

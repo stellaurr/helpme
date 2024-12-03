@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Box,
@@ -19,36 +20,39 @@ import AdoptionForm from './AdoptionForm';
 import RehomeForm from './RehomeForm';
 import goldenImage from '../assets/golden_retriever.jpg';
 import siameseImage from '../assets/siamese.jpg';
+import axios from 'axios';
 
-const PetList = () => {
+const PetList = ({ onPetAdded }) => {
   const [openAdoption, setOpenAdoption] = useState(false);
-  const [openRehome, setOpenRehome] = useState(false); // Add this line
+  const [openRehome, setOpenRehome] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
   const navigate = useNavigate();
-  
+  const [pets, setPets] = useState([]);
 
-  const pets = [
-    {
-      petId: 'P001', // Added Pet ID
-      image: goldenImage,
-      breed: 'Golden Retriever',
-      type: 'Dog',
-      name: 'Buddy',
-      age: 3,
-      gender: 'Male',
-      description: 'A friendly and intelligent breed.',
-    },
-    {
-      petId: 'P002', // Added Pet ID
-      image: siameseImage,
-      breed: 'Siamese',
-      type: 'Cat',
-      name: 'Luna',
-      age: 2,
-      gender: 'Female',
-      description: 'An affectionate and playful breed.',
-    },
-  ];
+  useEffect(() => {
+    fetchRecords();
+  }, []);
+
+  const fetchRecords = async () => {
+    try {
+        const response = await axios.get("http://localhost:8080/api/pet/getAllPets");
+        const uniquePets = new Set();
+        const filteredPets = response.data.filter(pet => {
+            if (pet.status !== 'APPROVED_REHOME' && !uniquePets.has(pet.petId)) {
+                uniquePets.add(pet.petId);
+                return true;
+            }
+            return false;
+        });
+        setPets(filteredPets);
+    } catch (error) {
+        console.error("Failed to fetch updated PetList", error);
+    }
+  };
+
+  const handleNewPet = (newPet) => {
+    setPets((prevPets) => [...prevPets, newPet]);
+  };
 
   const handleCardClick = (pet) => {
     setSelectedPet(pet);
@@ -63,14 +67,6 @@ const PetList = () => {
   const handleRehomeClick = () => {
     setOpenRehome(true);
   };
-  const fetchRecords = async () => {
-    try {
-        const response = await axios.get("http://localhost:8080/api/pet/getAllPets");
-        setPets(response.data);  // Assuming you have a state called 'pets' for PetList
-    } catch (error) {
-        console.error("Failed to fetch updated PetList", error);
-    }
-};
 
   const handleRehomeClose = () => {
     setOpenRehome(false);
@@ -79,29 +75,29 @@ const PetList = () => {
   return (
     <>
       <div style={styles.pageContainer}>
-      <Typography variant="h6" component="h6" sx={{ color: '#5A20A8', fontWeight: 'bold', padding: '20px' }}>
-  List of Pets to Adopt
-</Typography>
+        <Typography variant="h6" component="h6" sx={{ color: '#5A20A8', fontWeight: 'bold', padding: '20px' }}>
+          List of Pets to Adopt
+        </Typography>
 
         <div style={styles.listContainer}>
           {pets.length > 0 ? (
-            pets.map((pet, index) => (
+            pets.map((pet) => (
               <Card
-                key={index}
+                key={pet.petId}
                 sx={{
                   width: 360,
-                  height: 590, // Increased height to accommodate all content
+                  height: 590,
                   display: 'flex',
                   flexDirection: 'column',
                   cursor: 'pointer',
                 }}
                 onClick={() => handleCardClick(pet)}
               >
-                {pet.image ? (
+                {pet.photo ? (
                   <CardMedia
                     component="img"
                     height="140"
-                    image={pet.image}
+                    image={pet.photo}
                     alt={pet.breed}
                     sx={{ objectFit: 'cover' }}
                   />
@@ -148,13 +144,13 @@ const PetList = () => {
                     Pet ID
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
-                    {pet.petId} {/* Display Pet ID */}
+                    {pet.petId}
                   </Typography>
                   <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
                     Name
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
-                    {pet.name} {/* Display pet name */}
+                    {pet.name}
                   </Typography>
                   <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
                     Pet Type
@@ -172,13 +168,13 @@ const PetList = () => {
                     Age
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
-                    {pet.age} years {/* Display pet age */}
+                    {pet.age} years
                   </Typography>
                   <Typography color="#5A20A8" fontSize="12px" fontWeight="bold">
                     Gender
                   </Typography>
                   <Typography color="#5A20A8" fontWeight="bold" sx={{ ml: 2 }}>
-                    {pet.gender} {/* Display pet gender */}
+                    {pet.gender}
                   </Typography>
                   <br />
                   <Typography color="#5A20A8" fontStyle="italic" fontWeight="bold" noWrap>

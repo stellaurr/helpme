@@ -18,7 +18,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const PetDashboard = () => {
+const PetDashboard = ({ onPetAdded = () => {} }) => {
     const [rehomes, setRehomes] = useState([]); // State to store rehome records
     const [editRehome, setEditRehome] = useState(null);
     const [newStatus, setNewStatus] = useState(''); 
@@ -62,19 +62,9 @@ const PetDashboard = () => {
     const handleSaveRehomeStatus = async () => {
         try {
             if (editRehome) {
-                const petToAdd = {
-                    name: editRehome.name,
-                    type: editRehome.type,
-                    breed: editRehome.breed,
-                    age: editRehome.age,
-                    gender: editRehome.gender,
-                    description: editRehome.description,
-                    photo: editRehome.photo, 
-                    status: 'AVAILABLE', 
-                    userName: editRehome.userName,
-                    address: editRehome.address,
-                    contactNumber: editRehome.contactNumber,
-                    submissionDate: editRehome.submissionDate,
+                const petToUpdate = {
+                    ...editRehome, // Use the existing pet data
+                    status: newStatus // Update only the status
                 };
 
                 if (newStatus === 'REJECTED') {
@@ -82,13 +72,27 @@ const PetDashboard = () => {
                     setRehomes((prev) => prev.filter((rehome) => rehome.pid !== editRehome.pid));
                     setSuccessMessage('Rehome record rejected and deleted.');
                 } else if (newStatus === 'ACCEPTED_REHOME') {
-                    await axios.post('http://localhost:8080/api/pet/postpetrecord', petToAdd);
-                    setRehomes((prev) => prev.filter((rehome) => rehome.pid !== editRehome.pid));
-                    setSuccessMessage('Rehome approved and pet added to PetList.');
+                    // Update the status using the correct endpoint structure
+                    await axios.put(`http://localhost:8080/api/pet/putPetDetails`, petToUpdate, {
+                        params: {
+                            pid: editRehome.pid // Ensure this is the correct ID
+                        }
+                    });
+
+                    // Update the status in the local state without creating a new entry
+                    setRehomes(prev => 
+                        prev.map(rehome => 
+                            rehome.pid === editRehome.pid 
+                                ? {...rehome, status: 'ACCEPTED_REHOME'} // Update status only
+                                : rehome
+                        )
+                    );
+                    setSuccessMessage('Rehome approved.');
                 }
             }
         } catch (error) {
-            setError('Failed to update rehome status.');
+            console.error('Error updating rehome status:', error.response?.data || error.message);
+            setError('Failed to update rehome status. ' + (error.response?.data?.message || error.message));
         } finally {
             handleDialogClose();
         }
@@ -126,7 +130,7 @@ const PetDashboard = () => {
                         <Typography variant="body1" style={styles.textShade}>User Name: {rehome.userName}</Typography>
                         <Typography variant="body1" style={styles.textShade}>Address: {rehome.address}</Typography>
                         <Typography variant="body1" style={styles.textShade}>Contact Number: {rehome.contactNumber}</Typography>
-                        <Typography variant="body1" style={styles.textShade}>Submission Date: {rehome.submissionDate}</Typography>
+                        <Typography variant="body1" style={styles.textShade}>Submission Date: {rehome.submissionDate || 'N/A'}</Typography>
                         <Typography variant="body1" style={styles.textShade}>Status: {rehome.status}</Typography>
 
                         {rehome.photo && (
@@ -231,6 +235,9 @@ const styles = {
     },
     centeredHeading: {
         textAlign: 'center',
+        fontFamily: "'Arial', sans-serif",
+        fontWeight: 'bold',
+        color: '#5A20A8',
         marginBottom: '20px',
         marginTop: '40px',
     },

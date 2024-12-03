@@ -23,8 +23,8 @@ const RehomeForm = () => {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setPetData({
-        ...petData,
+    setFormData({
+        ...formData,
         image: file,
     });
 };
@@ -57,7 +57,7 @@ const RehomeForm = () => {
     form.append("userName", formData.userName); 
     form.append("address", formData.address);
     form.append("contactNumber", formData.contactNumber);
-    form.append("submissionDate", formData.submissionDate);
+    form.append("submissionDate", new Date().toISOString().split('T')[0]); // Set submission date to today's date
     form.append("status", "PENDING_REHOME"); // Set status to pending rehome
 
     resetForm();
