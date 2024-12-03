@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -36,14 +35,10 @@ const PetList = ({ onPetAdded }) => {
   const fetchRecords = async () => {
     try {
         const response = await axios.get("http://localhost:8080/api/pet/getAllPets");
-        const uniquePets = new Set();
-        const filteredPets = response.data.filter(pet => {
-            if (pet.status !== 'APPROVED_REHOME' && !uniquePets.has(pet.petId)) {
-                uniquePets.add(pet.petId);
-                return true;
-            }
-            return false;
-        });
+        console.log(response.data);
+
+        const filteredPets = response.data.filter(pet => pet.status === 'ACCEPTED_REHOME');
+
         setPets(filteredPets);
     } catch (error) {
         console.error("Failed to fetch updated PetList", error);
